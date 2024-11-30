@@ -17,12 +17,6 @@ export interface DOMMatchers {
   readonly TEXT_ONLY: string;
 }
 
-export interface PerformanceConfig {
-  readonly BATCH_TIMEOUT: number;
-  readonly SCROLL_THROTTLE: number;
-  readonly TASK_DELAY: number;
-}
-
 export interface ElementPosition {
   $element: Element;
   $width: number;

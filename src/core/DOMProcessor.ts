@@ -1,9 +1,4 @@
-import {
-  APP_CONFIG,
-  DOM_CONFIG,
-  PERFORMANCE_CONFIG,
-  PROCESSOR_CONFIG,
-} from "../constants/config";
+import { APP_CONFIG, DOM_CONFIG, PROCESSOR_CONFIG } from "../constants/config";
 import { DOMProcessorConfig } from "../types/index";
 import {
   getElementPosition,
@@ -11,7 +6,6 @@ import {
   isElementVisible,
 } from "../utils/dom/elementUtils";
 import { createBionicNode } from "./TextTransformer";
-import { throttle } from "../utils/performance/throttle";
 
 export class DOMProcessor {
   private boundHandleScroll: () => void;
@@ -19,7 +13,6 @@ export class DOMProcessor {
   private readonly config: DOMProcessorConfig;
   private documentWrite?: typeof document.write;
   private documentWriteln?: typeof document.writeln;
-  // Add ! for definite assignment assertion
   private intersectionObserver!: IntersectionObserver;
   private isProcessing = false;
   private mutationObserver!: MutationObserver;
@@ -27,25 +20,15 @@ export class DOMProcessor {
   private processedElements = new WeakSet<Element>();
   private taskBuffer: Element[] = [];
   private taskQueue: (() => void)[] = [];
-  private batchTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(config: DOMProcessorConfig = PROCESSOR_CONFIG) {
     this.config = config;
-    // Apply throttling to scroll handler
-    this.boundHandleScroll = throttle(
-      this.handleScroll.bind(this),
-      PERFORMANCE_CONFIG.SCROLL_THROTTLE
-    );
+    this.boundHandleScroll = this.handleScroll.bind(this);
     this.boundHandleWrite = this.handleWrite.bind(this);
     this.setupObservers();
   }
 
   private flushTaskBuffer(): void {
-    if (this.batchTimeout) {
-      clearTimeout(this.batchTimeout);
-      this.batchTimeout = null;
-    }
-
     if (this.taskBuffer.length === 0) return;
 
     const [visibleElements, hiddenElements] = this.partitionElements(
@@ -66,18 +49,6 @@ export class DOMProcessor {
       }
     });
   }
-
-  private scheduleBatchProcessing(): void {
-    if (this.batchTimeout) {
-      clearTimeout(this.batchTimeout);
-    }
-    
-    this.batchTimeout = setTimeout(
-      () => this.flushTaskBuffer(),
-      PERFORMANCE_CONFIG.BATCH_TIMEOUT
-    );
-  }
-
   // Add missing handleScroll method
   private handleScroll(): void {
     if (this.taskBuffer.length > 0) {
@@ -173,7 +144,6 @@ export class DOMProcessor {
     });
 
     this.taskBuffer.push(...elements);
-    this.scheduleBatchProcessing();
   }
 
   private async processQueue(): Promise<void> {
@@ -184,11 +154,6 @@ export class DOMProcessor {
       const task = this.taskQueue.shift();
       if (task) {
         task();
-        if (this.taskQueue.length > 0) {
-          await new Promise((resolve) =>
-            setTimeout(resolve, PERFORMANCE_CONFIG.TASK_DELAY),
-          );
-        }
       }
     }
 
@@ -243,7 +208,7 @@ export class DOMProcessor {
       });
     });
 
-    // Add scroll handler
+    // Simple scroll handler without throttling
     window.addEventListener("scroll", this.boundHandleScroll, {
       passive: true,
     });
@@ -318,11 +283,6 @@ export class DOMProcessor {
   }
 
   public stop(): void {
-    if (this.batchTimeout) {
-      clearTimeout(this.batchTimeout);
-      this.batchTimeout = null;
-    }
-    // Disconnect observers
     this.intersectionObserver.disconnect();
     this.mutationObserver.disconnect();
 

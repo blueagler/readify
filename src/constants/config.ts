@@ -1,8 +1,4 @@
-import {
-  DOMProcessorConfig,
-  PerformanceConfig,
-  ReadifyConfig,
-} from "../types/index";
+import { DOMProcessorConfig, ReadifyConfig } from "../types/index";
 
 export const PROCESSOR_CONFIG: DOMProcessorConfig = {
   BATCH_SIZE: 20,
@@ -29,12 +25,6 @@ export const APP_CONFIG: ReadifyConfig = {
     TEXT_ONLY: "a:not([href])",
   },
   MUTATION_ATTRIBUTES: ["class", "style", "contenteditable"] as const,
-} as const;
-
-export const PERFORMANCE_CONFIG: PerformanceConfig = {
-  BATCH_TIMEOUT: 0,
-  SCROLL_THROTTLE: 150,
-  TASK_DELAY: 0,
 } as const;
 
 export const DOM_CONFIG = {
