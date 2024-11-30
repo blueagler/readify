@@ -1,15 +1,45 @@
-import { DOMProcessor } from "./domProcessor";
+import type { DOMProcessorConfig } from "./types/index";
 
-function init(): void {
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      const processor = new DOMProcessor();
-      processor.start();
+import { PROCESSOR_CONFIG } from "./constants/config";
+import { DOMProcessor } from "./core/DOMProcessor";
+
+class Readify {
+  private static instance: null | Readify = null;
+  private processor: DOMProcessor;
+
+  constructor(config?: Partial<DOMProcessorConfig>) {
+    this.processor = new DOMProcessor({
+      ...PROCESSOR_CONFIG,
+      ...config,
     });
-  } else {
-    const processor = new DOMProcessor();
-    processor.start();
+  }
+
+  public static getInstance(config?: Partial<DOMProcessorConfig>): Readify {
+    if (!Readify.instance) {
+      Readify.instance = new Readify(config);
+    }
+    return Readify.instance;
+  }
+
+  public static init(config?: Partial<DOMProcessorConfig>): Readify {
+    const instance = Readify.getInstance(config);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", instance.start);
+    } else {
+      instance.start();
+    }
+    return instance;
+  }
+
+  public start(): void {
+    this.processor.start();
+  }
+
+  public stop(): void {
+    this.processor.stop();
   }
 }
 
-init();
+if (typeof window !== "undefined") {
+  Readify.init();
+}
