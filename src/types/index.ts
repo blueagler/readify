@@ -9,12 +9,12 @@ export interface DOMProcessorConfig {
 
 export interface ReadifyConfig {
   readonly DOM_MATCHERS: DOMMatchers;
-  readonly MUTATION_ATTRIBUTES: readonly string[];
+  readonly MUTATION_ATTRIBUTES: Set<string>;
 }
 
 export interface DOMMatchers {
-  readonly INTERACTIVE: string;
-  readonly TEXT_ONLY: string;
+  readonly INTERACTIVE: Set<string>;
+  readonly TEXT_ONLY: Set<string>;
 }
 
 export interface ElementPosition {

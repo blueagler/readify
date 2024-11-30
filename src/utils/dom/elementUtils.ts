@@ -11,12 +11,14 @@ export function isElementVisible(element: Element): boolean {
 }
 
 export function isBionicSpan(element: Element): boolean {
+  // Check if it's either the outer bionic span or an inner text span
   return (
     element instanceof HTMLSpanElement &&
-    element.childNodes.length === 2 &&
-    element.firstChild instanceof HTMLElement &&
-    element.firstChild.tagName === "STRONG" &&
-    element.lastChild?.nodeType === Node.TEXT_NODE
+    ((element.firstChild instanceof HTMLElement &&
+      element.firstChild.tagName === "STRONG") ||
+      (element.parentElement instanceof HTMLSpanElement &&
+        element.previousElementSibling instanceof HTMLElement &&
+        element.previousElementSibling.tagName === "STRONG"))
   );
 }
 

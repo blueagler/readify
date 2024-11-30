@@ -8,9 +8,8 @@ import {
 import { createBionicNode } from "./TextTransformer";
 
 export class DOMProcessor {
-  private boundHandleScroll: () => void;
   private boundHandleWrite: (this: Document, ...args: string[]) => void;
-  private readonly config: DOMProcessorConfig;
+  private readonly $config: DOMProcessorConfig;
   private documentWrite?: typeof document.write;
   private documentWriteln?: typeof document.writeln;
   private intersectionObserver!: IntersectionObserver;
@@ -22,8 +21,7 @@ export class DOMProcessor {
   private taskQueue: (() => void)[] = [];
 
   constructor(config: DOMProcessorConfig = PROCESSOR_CONFIG) {
-    this.config = config;
-    this.boundHandleScroll = this.handleScroll.bind(this);
+    this.$config = config;
     this.boundHandleWrite = this.handleWrite.bind(this);
     this.setupObservers();
   }
@@ -48,12 +46,6 @@ export class DOMProcessor {
         this.intersectionObserver.observe(element);
       }
     });
-  }
-  // Add missing handleScroll method
-  private handleScroll(): void {
-    if (this.taskBuffer.length > 0) {
-      this.flushTaskBuffer();
-    }
   }
 
   private handleWrite(...args: string[]): void {
@@ -83,7 +75,7 @@ export class DOMProcessor {
 
       const nodesToProcess = Array.from(element.childNodes).filter((node) =>
         node instanceof Element
-          ? !isBionicSpan(node)
+          ? !isBionicSpan(node) && !node.querySelector("strong")
           : node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
       );
 
@@ -92,7 +84,11 @@ export class DOMProcessor {
         nodesToProcess.forEach((node) => {
           if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) {
             fragment.appendChild(createBionicNode(node.textContent));
-          } else if (node instanceof Element && !isBionicSpan(node)) {
+          } else if (
+            node instanceof Element &&
+            !isBionicSpan(node) &&
+            !node.querySelector("strong")
+          ) {
             const clone = node.cloneNode(true);
             if (clone instanceof Element) {
               this.processElement(clone);
@@ -101,7 +97,7 @@ export class DOMProcessor {
           }
         });
 
-        element.textContent = "";
+        nodesToProcess.forEach((node) => node.remove());
         element.appendChild(fragment);
         this.processedElements.add(element);
       }
@@ -111,12 +107,15 @@ export class DOMProcessor {
   private processElement(element: Element): void {
     if (!this.shouldProcess(element)) return;
 
-    // Process children first
     Array.from(element.children)
-      .filter((child) => !this.isProcessed(child))
+      .filter(
+        (child) =>
+          !this.isProcessed(child) &&
+          !isBionicSpan(child) &&
+          !child.querySelector("strong"),
+      )
       .forEach((child) => this.processElement(child));
 
-    // Then process text nodes
     const textNodes = Array.from(element.childNodes).filter(
       (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
     );
@@ -129,7 +128,7 @@ export class DOMProcessor {
         }
       });
 
-      element.textContent = "";
+      textNodes.forEach((node) => node.remove());
       element.appendChild(fragment);
       this.processedElements.add(element);
     }
@@ -144,6 +143,7 @@ export class DOMProcessor {
     });
 
     this.taskBuffer.push(...elements);
+    this.flushTaskBuffer();
   }
 
   private async processQueue(): Promise<void> {
@@ -168,7 +168,6 @@ export class DOMProcessor {
   }
 
   private setupObservers(): void {
-    // Setup Intersection Observer
     this.intersectionObserver = new IntersectionObserver(
       (entries) =>
         entries.forEach((entry) => {
@@ -178,12 +177,11 @@ export class DOMProcessor {
           }
         }),
       {
-        rootMargin: this.config.INTERSECTION_MARGIN,
-        threshold: this.config.INTERSECTION_THRESHOLD,
+        rootMargin: this.$config.INTERSECTION_MARGIN,
+        threshold: this.$config.INTERSECTION_THRESHOLD,
       },
     );
 
-    // Setup Mutation Observer
     this.mutationObserver = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.type === "childList") {
@@ -207,16 +205,11 @@ export class DOMProcessor {
         }
       });
     });
-
-    // Simple scroll handler without throttling
-    window.addEventListener("scroll", this.boundHandleScroll, {
-      passive: true,
-    });
   }
 
   private shouldProcess(element: Element): boolean {
     return (
-      !this.config.IGNORE_TAGS.has(element.tagName) &&
+      !this.$config.IGNORE_TAGS.has(element.tagName) &&
       !this.isProcessed(element)
     );
   }
@@ -235,7 +228,7 @@ export class DOMProcessor {
         currentColumn.push(pos);
       } else {
         const lastX = currentColumn[0].$x;
-        if (Math.abs(pos.$x - lastX) <= this.config.COLUMN_THRESHOLD) {
+        if (Math.abs(pos.$x - lastX) <= this.$config.COLUMN_THRESHOLD) {
           currentColumn.push(pos);
         } else {
           columns.push(
@@ -255,12 +248,10 @@ export class DOMProcessor {
     return columns.reduce((acc, column) => acc.concat(column), []);
   }
 
-  public start(): void {
-    // Save original methods
+  public $start(): void {
     this.documentWrite = document.write;
     this.documentWriteln = document.writeln;
 
-    // Override document.write methods
     Object.defineProperties(document, {
       write: {
         configurable: true,
@@ -272,10 +263,8 @@ export class DOMProcessor {
       },
     });
 
-    // Start processing
     this.processNewElement(document.body);
 
-    // Start observing mutations
     this.mutationObserver.observe(document.body, {
       ...DOM_CONFIG.MUTATION_OPTIONS,
       attributeFilter: [...APP_CONFIG.MUTATION_ATTRIBUTES],
@@ -286,7 +275,6 @@ export class DOMProcessor {
     this.intersectionObserver.disconnect();
     this.mutationObserver.disconnect();
 
-    // Restore original document.write methods
     if (this.documentWrite && this.documentWriteln) {
       Object.defineProperties(document, {
         write: { value: this.documentWrite },
@@ -294,7 +282,6 @@ export class DOMProcessor {
       });
     }
 
-    // Clear queues
     this.taskQueue = [];
     this.taskBuffer = [];
     this.isProcessing = false;
