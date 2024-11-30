@@ -1,5 +1,5 @@
-import { APP_CONFIG, DOM_CONFIG, PROCESSOR_CONFIG } from "../constants/config";
-import { DOMProcessorConfig } from "../types/index";
+import { PROCESSOR_CONFIG } from "../constants/config";
+import { CustomizedConfig, ProcessorConfig } from "../types/index";
 import {
   getElementPosition,
   isBionicSpan,
@@ -8,8 +8,8 @@ import {
 import { createBionicNode } from "./TextTransformer";
 
 export class DOMProcessor {
+  private readonly $config: ProcessorConfig;
   private boundHandleWrite: (this: Document, ...args: string[]) => void;
-  private readonly $config: DOMProcessorConfig;
   private documentWrite?: typeof document.write;
   private documentWriteln?: typeof document.writeln;
   private intersectionObserver!: IntersectionObserver;
@@ -20,8 +20,24 @@ export class DOMProcessor {
   private taskBuffer: Element[] = [];
   private taskQueue: (() => void)[] = [];
 
-  constructor(config: DOMProcessorConfig = PROCESSOR_CONFIG) {
-    this.$config = config;
+  constructor(config?: Partial<CustomizedConfig>) {
+    this.$config = PROCESSOR_CONFIG;
+    if (config?.boldFactor) {
+      this.$config.BIONIC.boldFactor = config.boldFactor;
+    }
+    if (config?.commonWords) {
+      config?.commonWords.forEach((word) => {
+        this.$config.BIONIC.commonWords.add(word);
+      });
+    }
+    if (config?.syllableExceptions) {
+      config?.syllableExceptions.forEach((value, key) => {
+        this.$config.BIONIC.syllableExceptions.set(key, value);
+      });
+    }
+    if (config?.useSyllables) {
+      this.$config.BIONIC.useSyllables = config.useSyllables;
+    }
     this.boundHandleWrite = this.handleWrite.bind(this);
     this.setupObservers();
   }
@@ -83,7 +99,9 @@ export class DOMProcessor {
         const fragment = document.createDocumentFragment();
         nodesToProcess.forEach((node) => {
           if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) {
-            fragment.appendChild(createBionicNode(node.textContent));
+            fragment.appendChild(
+              createBionicNode(node.textContent, this.$config),
+            ); // Pass config here
           } else if (
             node instanceof Element &&
             !isBionicSpan(node) &&
@@ -124,7 +142,9 @@ export class DOMProcessor {
       const fragment = document.createDocumentFragment();
       textNodes.forEach((node) => {
         if (node.textContent) {
-          fragment.appendChild(createBionicNode(node.textContent));
+          fragment.appendChild(
+            createBionicNode(node.textContent, this.$config),
+          ); // Pass config here
         }
       });
 
@@ -209,7 +229,7 @@ export class DOMProcessor {
 
   private shouldProcess(element: Element): boolean {
     return (
-      !this.$config.IGNORE_TAGS.has(element.tagName) &&
+      !this.$config.ignoreTags.has(element.tagName) &&
       !this.isProcessed(element)
     );
   }
@@ -266,8 +286,8 @@ export class DOMProcessor {
     this.processNewElement(document.body);
 
     this.mutationObserver.observe(document.body, {
-      ...DOM_CONFIG.MUTATION_OPTIONS,
-      attributeFilter: [...APP_CONFIG.MUTATION_ATTRIBUTES],
+      ...this.$config.MUTATION.OPTIONS,
+      attributeFilter: [...this.$config.MUTATION.ATTRIBUTES_FILTER],
     });
   }
 

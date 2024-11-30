@@ -1,11 +1,11 @@
-import { PROCESSOR_CONFIG } from "../../constants/config";
+import { PROCESSOR_CONFIG, screenHeight } from "../../constants/config";
 import { ElementPosition } from "../../types/index";
 
 export function isElementVisible(element: Element): boolean {
   if (!(element instanceof HTMLElement)) return false;
   const rect = element.getBoundingClientRect();
   return (
-    rect.top <= window.innerHeight + PROCESSOR_CONFIG.VIEWPORT_MARGIN &&
+    rect.top <= screenHeight + PROCESSOR_CONFIG.VIEWPORT_MARGIN &&
     rect.bottom >= -PROCESSOR_CONFIG.VIEWPORT_MARGIN
   );
 }
