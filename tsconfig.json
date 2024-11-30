@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "ESNext",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "outDir": "./ts-out",
+    "strict": true,
+    "allowJs": false,
+    "moduleResolution": "Bundler",
+    "rootDir": "./",
+    "target": "ESNext"
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+  ],
+  "include": [
+    "src/*.ts",
+    "eslint.config.mjs"
+  ]
+}
