@@ -1,12 +1,13 @@
 {
   "name": "@blueagle/readify",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "devDependencies": {
     "@types/bun": "1.1.13",
     "@types/chrome": "0.0.280",
     "@types/node": "22.9.0",
     "eslint": "^9.16.0",
     "eslint-plugin-perfectionist": "^3.9.1",
+    "gcc-ts-bundler": "0.1.0",
     "prettier": "3.3.3",
     "typescript": "5.8.0-dev.20241106",
     "typescript-eslint": "8.13.1-alpha.1",
@@ -17,14 +18,11 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "dev": "wxt", 
-    "dev:firefox": "wxt -b firefox", 
-    "build": "wxt build", 
-    "build:firefox": "wxt build -b firefox", 
-    "zip": "wxt zip", 
-    "zip:firefox": "wxt zip -b firefox", 
+    "dev": "wxt",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip -b firefox",
     "postinstall": "wxt prepare",
-    "gcc-content": "bun link gcc-ts-bundler && bun gcc-ts-bundler --src_dir='./content-script' --entry_point='./index.ts' --js_output_file='./dist/index.js' --language_out=ES5",
+    "build:content": "bun gcc-ts-bundler --src_dir='./content-script' --entry_point='./index.ts' --js_output_file='./dist/index.js' --language_out=ES5",
     "lint": "bun --bun prettier . --write && bun --bun eslint . --fix"
   },
   "sideEffects": [],
