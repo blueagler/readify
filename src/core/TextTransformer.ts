@@ -8,11 +8,7 @@ export function createBionicNode(
   text: string,
   config: ProcessorConfig,
 ): DocumentFragment {
-  if (typeof text !== "string") {
-    return document.createDocumentFragment();
-  }
-
-  if (!text.trim()) {
+  if (typeof text !== "string" || !text.trim()) {
     return document.createDocumentFragment();
   }
 
@@ -37,6 +33,8 @@ export function createBionicNode(
     return fragment;
   }
 
+  englishRanges.sort((a, b) => a.$start - b.$start);
+
   let lastEnd = 0;
   englishRanges.forEach(({ $end, $start }) => {
     if ($start > lastEnd) {
@@ -54,8 +52,8 @@ export function createBionicNode(
       }
 
       const wordSpan = document.createElement("span");
-
       const { boldLength } = analyzeWord(word, config.BIONIC);
+
       if (boldLength === 0) {
         wordSpan.textContent = word;
       } else {

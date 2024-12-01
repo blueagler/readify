@@ -8,6 +8,12 @@ import {
 } from "../utils/dom/elementUtils";
 import { createBionicNode } from "./TextTransformer";
 
+const queueMicrotask =
+  globalThis.queueMicrotask ||
+  (typeof Promise !== "undefined"
+    ? (cb: () => void) => Promise.resolve().then(cb)
+    : (cb: () => void) => setTimeout(cb, 0));
+
 export class DOMProcessor {
   private readonly $config: ProcessorConfig = PROCESSOR_CONFIG;
   private intersectionObserver!: IntersectionObserver;
@@ -83,9 +89,20 @@ export class DOMProcessor {
   }
 
   private getTextNodes(element: Element): Node[] {
-    return Array.from(element.childNodes).filter(
-      (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
-    );
+    const nodes: Node[] = [];
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, {
+      acceptNode: (node) =>
+        node.textContent?.trim()
+          ? NodeFilter.FILTER_ACCEPT
+          : NodeFilter.FILTER_REJECT,
+    });
+
+    let node;
+    while ((node = walker.nextNode())) {
+      nodes.push(node);
+    }
+
+    return nodes;
   }
 
   private isIgnoredTag(element: Element): boolean {
@@ -145,7 +162,6 @@ export class DOMProcessor {
     this.isProcessing = true;
 
     while (this.taskQueue.length > 0) {
-      // Use microtasks to yield to the main thread periodically
       await new Promise(queueMicrotask);
 
       const task = this.taskQueue.shift();
@@ -176,18 +192,19 @@ export class DOMProcessor {
       this.processTextNodes(node);
     }
 
-    const textNodes = this.getTextNodes(element);
+    const textNodes = Array.from(element.childNodes).filter(
+      (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
+    );
+
     if (!textNodes.length) return;
 
-    const fragment = document.createDocumentFragment();
+    // Process each text node in place
     textNodes.forEach((node) => {
       if (node.textContent) {
-        fragment.appendChild(createBionicNode(node.textContent, this.$config));
+        const processedNode = createBionicNode(node.textContent, this.$config);
+        node.parentNode?.replaceChild(processedNode, node);
       }
     });
-
-    textNodes.forEach((node) => node.parentNode?.removeChild(node));
-    element.appendChild(fragment);
 
     if (element instanceof HTMLElement) {
       element.setAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR, "");
