@@ -5,6 +5,7 @@ import {
   getElementPosition,
   isBionicSpan,
   isElementVisible,
+  isInsideIgnoredTag 
 } from "../utils/dom/elementUtils";
 import { createBionicNode } from "./TextTransformer";
 
@@ -136,9 +137,20 @@ export class DOMProcessor {
 
   private processNewContent(root: Element): void {
     queueMicrotask(() => {
+      // First check if root is inside ignored tag
+      if (isInsideIgnoredTag(root, this.$config.ignoreTags)) {
+        return;
+      }
+
       const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
         acceptNode: (node): number => {
           if (!(node instanceof HTMLElement)) return NodeFilter.FILTER_SKIP;
+          
+          // Early rejection for ignored tags
+          if (this.$config.ignoreTags.has(node.tagName)) {
+            return NodeFilter.FILTER_REJECT; // Skip this node and its children
+          }
+
           return this.getTextNodes(node).length > 0 && this.shouldProcess(node)
             ? NodeFilter.FILTER_ACCEPT
             : NodeFilter.FILTER_SKIP;
@@ -151,8 +163,10 @@ export class DOMProcessor {
         elements.push(node);
       }
 
-      this.taskBuffer.push(...elements);
-      this.flushTaskBuffer();
+      if (elements.length > 0) {
+        this.taskBuffer.push(...elements);
+        this.flushTaskBuffer();
+      }
     });
   }
 
@@ -259,13 +273,13 @@ export class DOMProcessor {
     this.intersectionObserver = new IntersectionObserver(
       (entries) =>
         entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.target instanceof Element) {
+          if (entry.isIntersecting && 
+              entry.target instanceof Element && 
+              !isInsideIgnoredTag(entry.target, this.$config.ignoreTags)) {
             this.queueTask(() => this.processTextNodes(entry.target));
             this.intersectionObserver.unobserve(entry.target);
             if (entry.target instanceof HTMLElement) {
-              entry.target.removeAttribute(
-                this.$config.DOM_ATTRS.OBSERVED_ATTR,
-              );
+              entry.target.removeAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR);
             }
           }
         }),
@@ -290,13 +304,17 @@ export class DOMProcessor {
               ? mutation.target
               : null;
 
-        if (target instanceof Element && !this.isProcessed(target)) {
+        if (target instanceof Element && 
+            !this.isProcessed(target) && 
+            !isInsideIgnoredTag(target, this.$config.ignoreTags)) {
           this.queueTask(() => this.processNewContent(target));
         } else if (mutation.type === "childList") {
           mutation.addedNodes.forEach((node) => {
-            node instanceof Element &&
-              !this.isProcessed(node) &&
+            if (node instanceof Element && 
+                !this.isProcessed(node) && 
+                !isInsideIgnoredTag(node, this.$config.ignoreTags)) {
               this.queueTask(() => this.processNewContent(node));
+            }
           });
         }
       });
@@ -306,12 +324,15 @@ export class DOMProcessor {
   private shouldProcess(element: Element): boolean {
     if (!element || !(element instanceof HTMLElement)) return false;
 
-    if (element.hasAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR))
-      return false;
-    if (element.closest(`[${this.$config.DOM_ATTRS.PROCESSED_ATTR}]`))
-      return false;
+    if (element.hasAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR)) return false;
+    if (element.closest(`[${this.$config.DOM_ATTRS.PROCESSED_ATTR}]`)) return false;
 
-    if (this.isIgnoredTag(element)) return false;
+    // Quick check for element's own tag
+    if (this.$config.ignoreTags.has(element.tagName)) return false;
+    
+    // Check for ignored parent tags
+    if (isInsideIgnoredTag(element, this.$config.ignoreTags)) return false;
+    
     if (isBionicSpan(element)) return false;
 
     return true;

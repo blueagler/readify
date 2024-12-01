@@ -44,3 +44,14 @@ export function getElementPosition(element: Element): ElementPosition {
     $y: rect.top,
   };
 }
+
+export function isInsideIgnoredTag(element: Element, ignoreTags: Set<string>): boolean {
+  let current = element;
+  while (current) {
+    if (ignoreTags.has(current.tagName)) {
+      return true;
+    }
+    current = current.parentElement as Element;
+  }
+  return false;
+}
