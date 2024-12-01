@@ -1,7 +1,14 @@
 import { Readify } from "./Readify";
 
-export const init = () => {
-  Readify.init({
+
+let instance: Readify | null = null;
+
+export const start = () => {
+  instance = Readify.init({
     boldSingleSyllables: true,
   });
+}
+
+export const stop = () => {
+  instance?.stop();
 }

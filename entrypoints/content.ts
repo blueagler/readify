@@ -1,11 +1,14 @@
-import { init } from "../dist/index";
+import { start, stop } from "../dist/index";
 import { defineContentScript } from "wxt/sandbox";
 
 export default defineContentScript({
-  main() {
-    init();
+  main(ctx) {
+    ctx.addEventListener(document, "DOMContentLoaded", start);
+    ctx.onInvalidated(stop);
   },
   matches: ['<all_urls>'],
-  runAt: "document_idle",
-  world: "MAIN",
+  runAt: "document_start",
+  world: "ISOLATED",
+  allFrames: true,
+  registration: "manifest"
 });
