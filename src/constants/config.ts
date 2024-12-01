@@ -558,6 +558,7 @@ export const PROCESSOR_CONFIG: ProcessorConfig = {
   BIONIC,
   COLUMN_THRESHOLD: Math.max(50, Math.min(200, Math.floor(screenWidth * 0.1))),
   DOM_ATTRS,
+  ELEMENTS_PER_FRAME: isMobile ? 10 : 20,
   ignoreTags: new Set([
     "SCRIPT",
     "STYLE",

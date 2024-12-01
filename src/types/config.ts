@@ -29,6 +29,7 @@ export interface ProcessorConfig {
   readonly BIONIC: BionicConfig;
   readonly COLUMN_THRESHOLD: number;
   readonly DOM_ATTRS: DOMAttributes;
+  readonly ELEMENTS_PER_FRAME: number;
   readonly ignoreTags: Set<string>;
   readonly INTERSECTION_MARGIN: string;
   readonly INTERSECTION_THRESHOLD: number;

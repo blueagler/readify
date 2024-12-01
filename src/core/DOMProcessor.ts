@@ -11,6 +11,7 @@ import { createBionicNode } from "./TextTransformer";
 export class DOMProcessor {
   private readonly $config: ProcessorConfig = PROCESSOR_CONFIG;
   private intersectionObserver!: IntersectionObserver;
+  private isAnimationScheduled = false;
   private isProcessing = false;
   private mutationObserver!: MutationObserver;
   private taskBuffer: Element[] = [];
@@ -37,19 +38,29 @@ export class DOMProcessor {
       root.removeAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR);
       root.removeAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR);
     }
-    const elements = root.querySelectorAll(
-      `[${this.$config.DOM_ATTRS.PROCESSED_ATTR}], [${this.$config.DOM_ATTRS.OBSERVED_ATTR}]`,
-    );
-    elements.forEach((el) => {
-      if (el instanceof HTMLElement) {
-        el.removeAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR);
-        el.removeAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR);
-      }
+
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
+      acceptNode: (node): number => {
+        if (!(node instanceof HTMLElement)) return NodeFilter.FILTER_SKIP;
+        return node.hasAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR) ||
+          node.hasAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR)
+          ? NodeFilter.FILTER_ACCEPT
+          : NodeFilter.FILTER_SKIP;
+      },
     });
+
+    let node: Element | null;
+    while ((node = walker.nextNode() as Element)) {
+      if (node instanceof HTMLElement) {
+        node.removeAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR);
+        node.removeAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR);
+      }
+    }
   }
 
   private flushTaskBuffer(): void {
     if (this.taskBuffer.length === 0) return;
+
     const [visibleElements, hiddenElements] = this.partitionElements(
       this.taskBuffer,
     );
@@ -57,9 +68,7 @@ export class DOMProcessor {
 
     const sortedVisible = this.sortElementsByReadingOrder(visibleElements);
     if (sortedVisible.length > 0) {
-      this.queueTask(() =>
-        sortedVisible.forEach((element) => this.processTextNodes(element)),
-      );
+      this.scheduleVisualUpdate(sortedVisible);
     }
 
     hiddenElements.forEach((element) => {
@@ -77,6 +86,18 @@ export class DOMProcessor {
     return Array.from(element.childNodes).filter(
       (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
     );
+  }
+
+  private isIgnoredTag(element: Element): boolean {
+    if (this.$config.ignoreTags.has(element.tagName)) return true;
+
+    let parent = element.parentElement;
+    while (parent) {
+      if (this.$config.ignoreTags.has(parent.tagName)) return true;
+      parent = parent.parentElement;
+    }
+
+    return false;
   }
 
   private isProcessed(element: Element): boolean {
@@ -97,19 +118,36 @@ export class DOMProcessor {
   }
 
   private processNewContent(root: Element): void {
-    const elements = [...root.querySelectorAll("*")].filter(
-      (el) => this.getTextNodes(el).length > 0 && this.shouldProcess(el),
-    );
+    queueMicrotask(() => {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
+        acceptNode: (node): number => {
+          if (!(node instanceof HTMLElement)) return NodeFilter.FILTER_SKIP;
+          return this.getTextNodes(node).length > 0 && this.shouldProcess(node)
+            ? NodeFilter.FILTER_ACCEPT
+            : NodeFilter.FILTER_SKIP;
+        },
+      });
 
-    this.taskBuffer.push(...elements);
-    this.flushTaskBuffer();
+      const elements: Element[] = [];
+      let node: Element | null;
+      while ((node = walker.nextNode() as Element)) {
+        elements.push(node);
+      }
+
+      this.taskBuffer.push(...elements);
+      this.flushTaskBuffer();
+    });
   }
 
   private async processQueue(): Promise<void> {
     if (this.isProcessing) return;
+
     this.isProcessing = true;
 
     while (this.taskQueue.length > 0) {
+      // Use microtasks to yield to the main thread periodically
+      await new Promise(queueMicrotask);
+
       const task = this.taskQueue.shift();
       if (task) {
         task();
@@ -122,14 +160,21 @@ export class DOMProcessor {
   private processTextNodes(element: Element): void {
     if (!this.shouldProcess(element)) return;
 
-    Array.from(element.children)
-      .filter(
-        (child) =>
-          !this.isProcessed(child) &&
-          !isBionicSpan(child) &&
-          !child.querySelector("strong"),
-      )
-      .forEach((child) => this.processTextNodes(child));
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, {
+      acceptNode: (node): number => {
+        if (!(node instanceof HTMLElement)) return NodeFilter.FILTER_SKIP;
+        return !this.isProcessed(node) &&
+          !isBionicSpan(node) &&
+          !node.querySelector("strong")
+          ? NodeFilter.FILTER_ACCEPT
+          : NodeFilter.FILTER_SKIP;
+      },
+    });
+
+    let node: Element | null;
+    while ((node = walker.nextNode() as Element)) {
+      this.processTextNodes(node);
+    }
 
     const textNodes = this.getTextNodes(element);
     if (!textNodes.length) return;
@@ -151,9 +196,46 @@ export class DOMProcessor {
 
   private queueTask(task: () => void): void {
     this.taskQueue.push(task);
+
     if (!this.isProcessing) {
-      this.processQueue();
+      queueMicrotask(() => this.processQueue());
     }
+  }
+
+  private scheduleVisualUpdate(elements: Element[]): void {
+    if (elements.length === 0) return;
+
+    this.queueTask(() => {
+      let index = 0;
+
+      const processNextBatch = () => {
+        const startTime = performance.now();
+        const endIndex = Math.min(
+          index + this.$config.ELEMENTS_PER_FRAME,
+          elements.length,
+        );
+
+        while (index < endIndex) {
+          this.processTextNodes(elements[index]);
+          index++;
+          if (performance.now() - startTime > 16) {
+            break;
+          }
+        }
+
+        if (index < elements.length) {
+          requestAnimationFrame(processNextBatch);
+        }
+      };
+
+      if (!this.isAnimationScheduled) {
+        this.isAnimationScheduled = true;
+        requestAnimationFrame(() => {
+          processNextBatch();
+          this.isAnimationScheduled = false;
+        });
+      }
+    });
   }
 
   private setupObservers(): void {
@@ -212,7 +294,7 @@ export class DOMProcessor {
     if (element.closest(`[${this.$config.DOM_ATTRS.PROCESSED_ATTR}]`))
       return false;
 
-    if (this.$config.ignoreTags.has(element.tagName)) return false;
+    if (this.isIgnoredTag(element)) return false;
     if (isBionicSpan(element)) return false;
 
     return true;
