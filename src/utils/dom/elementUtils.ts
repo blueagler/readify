@@ -1,5 +1,5 @@
 import { PROCESSOR_CONFIG, screenHeight } from "../../constants/config";
-import { ElementPosition } from "../../types/index";
+import { ElementPosition } from "../../types/core";
 
 export function isElementVisible(element: Element): boolean {
   if (!(element instanceof HTMLElement)) return false;
@@ -11,15 +11,28 @@ export function isElementVisible(element: Element): boolean {
 }
 
 export function isBionicSpan(element: Element): boolean {
-  // Check if it's either the outer bionic span or an inner text span
-  return (
-    element instanceof HTMLSpanElement &&
-    ((element.firstChild instanceof HTMLElement &&
-      element.firstChild.tagName === "STRONG") ||
-      (element.parentElement instanceof HTMLSpanElement &&
-        element.previousElementSibling instanceof HTMLElement &&
-        element.previousElementSibling.tagName === "STRONG"))
-  );
+  if (!(element instanceof HTMLElement)) return false;
+
+  if (element.hasAttribute(PROCESSOR_CONFIG.DOM_ATTRS.PROCESSED_ATTR))
+    return true;
+
+  if (
+    element.parentElement?.hasAttribute(
+      PROCESSOR_CONFIG.DOM_ATTRS.PROCESSED_ATTR,
+    )
+  )
+    return true;
+
+  if (element instanceof HTMLSpanElement) {
+    if (
+      element.firstElementChild instanceof HTMLElement &&
+      element.firstElementChild.tagName === "STRONG"
+    ) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 export function getElementPosition(element: Element): ElementPosition {

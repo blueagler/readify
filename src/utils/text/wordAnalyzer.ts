@@ -2,10 +2,17 @@ import { BionicConfig } from "../../types/config";
 
 interface WordAnalysis {
   boldLength: number;
+  isCommonWord: boolean;
   syllables: number;
 }
 
+const syllableCache = new Map<string, number>();
+const MAX_CACHE_SIZE = 10000;
+
 function countSyllables(word: string, config: BionicConfig): number {
+  const cached = syllableCache.get(word);
+  if (cached !== undefined) return cached;
+
   word = word.toLowerCase().replace(/[^a-z]/g, "");
   if (word.length <= 3) return 1;
 
@@ -27,6 +34,10 @@ function countSyllables(word: string, config: BionicConfig): number {
   if (config.SYLLABLE_PATTERNS.SILENT_E.test(word)) syllables--;
   if (config.SYLLABLE_PATTERNS.SILENT_ED.test(word)) syllables--;
   if (config.SYLLABLE_PATTERNS.SILENT_ES.test(word)) syllables--;
+
+  if (syllableCache.size < MAX_CACHE_SIZE) {
+    syllableCache.set(word, syllables);
+  }
 
   return Math.max(1, syllables);
 }
@@ -65,31 +76,57 @@ function getDynamicBoldLength(
   );
 }
 
+const analysisCache = new WeakMap<BionicConfig, Map<string, WordAnalysis>>();
+
 export function analyzeWord(word: string, config: BionicConfig): WordAnalysis {
   if (!word || typeof word !== "string") {
-    return { boldLength: 0, syllables: 0 };
+    return { boldLength: 0, isCommonWord: false, syllables: 0 };
+  }
+
+  let configCache = analysisCache.get(config);
+  if (configCache) {
+    const cached = configCache.get(word);
+    if (cached) return cached;
+  } else {
+    configCache = new Map();
+    analysisCache.set(config, configCache);
   }
 
   const length = word.length;
   if (length === 0) {
-    return { boldLength: 0, syllables: 0 };
+    return { boldLength: 0, isCommonWord: false, syllables: 0 };
   }
 
-  const isCommon = config.commonWords.has(word.toLowerCase());
+  const lowerWord = word.toLowerCase();
+  const isCommon = config.commonWords.has(lowerWord);
   const syllables = countSyllables(word, config);
 
-  const boldLength =
-    isCommon && !config.useSyllables
-      ? Math.ceil(length * config.RATIOS.COMMON_WORDS * config.boldFactor)
-      : config.useSyllables
-        ? getDynamicBoldLength(length, syllables, config)
-        : getDynamicBoldLength(length, 1, config);
+  let boldLength: number;
 
-  return {
-    boldLength: Math.max(
-      config.MIN_BOLD_LENGTH,
-      Math.min(config.MAX_BOLD_LENGTH, Math.min(length, boldLength)),
-    ),
+  if (isCommon) {
+    boldLength = config.boldCommonWords
+      ? Math.max(
+          1,
+          Math.ceil(length * config.RATIOS.COMMON_WORDS * config.boldFactor),
+        )
+      : 0;
+  } else {
+    if (syllables === 1 && !config.boldSingleSyllables) {
+      boldLength = 0;
+    } else {
+      boldLength = Math.max(1, getDynamicBoldLength(length, syllables, config));
+    }
+  }
+
+  const result = {
+    boldLength: Math.min(config.MAX_BOLD_LENGTH, Math.min(length, boldLength)),
+    isCommonWord: isCommon,
     syllables,
   };
+
+  if (configCache.size < MAX_CACHE_SIZE) {
+    configCache.set(word, result);
+  }
+
+  return result;
 }

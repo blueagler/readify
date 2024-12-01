@@ -1,36 +1,4 @@
-import { isPunctuation, isSymbol, isWhitespace } from "./stringUtils";
-
-export function splitIntoSentences(text: string): string[] {
-  const sentences: string[] = [];
-  let currentSentence = "";
-  let prevChar = "";
-
-  for (const char of text) {
-    if (char === "\n") {
-      if (currentSentence) {
-        sentences.push(currentSentence);
-        currentSentence = "";
-      }
-      sentences.push(char);
-      continue;
-    }
-
-    currentSentence += char;
-
-    if (isPunctuation(prevChar) && isWhitespace(char)) {
-      sentences.push(currentSentence);
-      currentSentence = "";
-    }
-
-    prevChar = char;
-  }
-
-  if (currentSentence) {
-    sentences.push(currentSentence);
-  }
-
-  return sentences;
-}
+import { isSymbol, isWhitespace } from "./stringUtils";
 
 export function splitIntoWords(text: string): string[] {
   const words: string[] = [];

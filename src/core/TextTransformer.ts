@@ -1,6 +1,7 @@
-import { ProcessorConfig } from "../types/index";
+import { ProcessorConfig } from "../types/config";
 import { isSpecialCharacter } from "../utils/text/stringUtils";
-import { splitIntoSentences, splitIntoWords } from "../utils/text/textSplitter";
+import { splitIntoWords } from "../utils/text/textSplitter";
+import { findEnglishRanges } from "../utils/text/textUtils";
 import { analyzeWord } from "../utils/text/wordAnalyzer";
 
 export function createBionicNode(
@@ -11,30 +12,71 @@ export function createBionicNode(
     return document.createDocumentFragment();
   }
 
-  const fragment = document.createDocumentFragment();
-  const sentences = splitIntoSentences(text);
+  if (!text.trim()) {
+    return document.createDocumentFragment();
+  }
 
-  sentences.forEach((sentence) => {
-    const words = splitIntoWords(sentence);
+  if (/<\/?(?:strong|span)/.test(text)) {
+    const fragment = document.createDocumentFragment();
+    fragment.appendChild(document.createTextNode(text));
+    return fragment;
+  }
+
+  const fragment = document.createDocumentFragment();
+  const containerSpan = document.createElement("span");
+  containerSpan.setAttribute(config.DOM_ATTRS.PROCESSED_ATTR, "");
+
+  const englishRanges = findEnglishRanges(text).filter(({ $end, $start }) => {
+    const word = text.slice($start, $end).trim();
+    return /^[a-zA-Z]+(?:[\s'][a-zA-Z]+)*$/.test(word);
+  });
+
+  if (englishRanges.length === 0) {
+    containerSpan.appendChild(document.createTextNode(text));
+    fragment.appendChild(containerSpan);
+    return fragment;
+  }
+
+  let lastEnd = 0;
+  englishRanges.forEach(({ $end, $start }) => {
+    if ($start > lastEnd) {
+      containerSpan.appendChild(
+        document.createTextNode(text.slice(lastEnd, $start)),
+      );
+    }
+
+    const englishText = text.slice($start, $end);
+    const words = splitIntoWords(englishText);
     words.forEach((word) => {
       if (!word.trim() || isSpecialCharacter(word)) {
-        fragment.appendChild(document.createTextNode(word));
+        containerSpan.appendChild(document.createTextNode(word));
         return;
       }
 
-      const span = document.createElement("span");
-      const graphemes = [...word];
-      const { boldLength } = analyzeWord(word, config.BIONIC);
+      const wordSpan = document.createElement("span");
 
-      const strong = document.createElement("strong");
-      strong.textContent = graphemes.slice(0, boldLength).join("");
-      span.appendChild(strong);
-      span.appendChild(
-        document.createTextNode(graphemes.slice(boldLength).join("")),
-      );
-      fragment.appendChild(span);
+      const { boldLength } = analyzeWord(word, config.BIONIC);
+      if (boldLength === 0) {
+        wordSpan.textContent = word;
+      } else {
+        const strong = document.createElement("strong");
+        strong.textContent = word.slice(0, boldLength);
+        wordSpan.appendChild(strong);
+        if (boldLength < word.length) {
+          wordSpan.appendChild(document.createTextNode(word.slice(boldLength)));
+        }
+      }
+
+      containerSpan.appendChild(wordSpan);
     });
+
+    lastEnd = $end;
   });
 
+  if (lastEnd < text.length) {
+    containerSpan.appendChild(document.createTextNode(text.slice(lastEnd)));
+  }
+
+  fragment.appendChild(containerSpan);
   return fragment;
 }

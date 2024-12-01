@@ -1,5 +1,6 @@
 import { PROCESSOR_CONFIG } from "../constants/config";
-import { CustomizedConfig, ProcessorConfig } from "../types/index";
+import { ProcessorConfig } from "../types/config";
+import { CustomizedConfig } from "../types/index";
 import {
   getElementPosition,
   isBionicSpan,
@@ -8,71 +9,81 @@ import {
 import { createBionicNode } from "./TextTransformer";
 
 export class DOMProcessor {
-  private readonly $config: ProcessorConfig;
-  private boundHandleWrite: (this: Document, ...args: string[]) => void;
-  private documentWrite?: typeof document.write;
-  private documentWriteln?: typeof document.writeln;
+  private readonly $config: ProcessorConfig = PROCESSOR_CONFIG;
   private intersectionObserver!: IntersectionObserver;
   private isProcessing = false;
   private mutationObserver!: MutationObserver;
-  private observedElements = new WeakSet<Element>();
-  private processedElements = new WeakSet<Element>();
   private taskBuffer: Element[] = [];
   private taskQueue: (() => void)[] = [];
 
   constructor(config?: Partial<CustomizedConfig>) {
-    this.$config = PROCESSOR_CONFIG;
-    if (config?.boldFactor) {
-      this.$config.BIONIC.boldFactor = config.boldFactor;
-    }
-    if (config?.commonWords) {
-      config?.commonWords.forEach((word) => {
-        this.$config.BIONIC.commonWords.add(word);
-      });
-    }
-    if (config?.syllableExceptions) {
-      config?.syllableExceptions.forEach((value, key) => {
-        this.$config.BIONIC.syllableExceptions.set(key, value);
-      });
-    }
-    if (config?.useSyllables) {
-      this.$config.BIONIC.useSyllables = config.useSyllables;
-    }
-    this.boundHandleWrite = this.handleWrite.bind(this);
+    this.$config.BIONIC.boldFactor =
+      config?.boldFactor || this.$config.BIONIC.boldFactor;
+    this.$config.BIONIC.boldSingleSyllables =
+      config?.boldSingleSyllables || this.$config.BIONIC.boldSingleSyllables;
+    this.$config.BIONIC.boldCommonWords =
+      config?.boldCommonWords || this.$config.BIONIC.boldCommonWords;
+    config?.commonWords?.forEach((word) =>
+      this.$config.BIONIC.commonWords.add(word),
+    );
+    config?.syllableExceptions?.forEach((value, key) =>
+      this.$config.BIONIC.syllableExceptions.set(key, value),
+    );
     this.setupObservers();
+  }
+
+  private cleanupRemovedElement(root: Element): void {
+    if (root instanceof HTMLElement) {
+      root.removeAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR);
+      root.removeAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR);
+    }
+    const elements = root.querySelectorAll(
+      `[${this.$config.DOM_ATTRS.PROCESSED_ATTR}], [${this.$config.DOM_ATTRS.OBSERVED_ATTR}]`,
+    );
+    elements.forEach((el) => {
+      if (el instanceof HTMLElement) {
+        el.removeAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR);
+        el.removeAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR);
+      }
+    });
   }
 
   private flushTaskBuffer(): void {
     if (this.taskBuffer.length === 0) return;
-
     const [visibleElements, hiddenElements] = this.partitionElements(
       this.taskBuffer,
     );
     this.taskBuffer = [];
 
     const sortedVisible = this.sortElementsByReadingOrder(visibleElements);
-
     if (sortedVisible.length > 0) {
-      this.queueTask(() => this.processBatch(sortedVisible));
+      this.queueTask(() =>
+        sortedVisible.forEach((element) => this.processTextNodes(element)),
+      );
     }
 
     hiddenElements.forEach((element) => {
-      if (!this.observedElements.has(element)) {
-        this.observedElements.add(element);
+      if (
+        element instanceof HTMLElement &&
+        !element.hasAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR)
+      ) {
+        element.setAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR, "");
         this.intersectionObserver.observe(element);
       }
     });
   }
 
-  private handleWrite(...args: string[]): void {
-    if (this.documentWrite) {
-      this.documentWrite.apply(document, args);
-      this.processNewElement(document.body);
-    }
+  private getTextNodes(element: Element): Node[] {
+    return Array.from(element.childNodes).filter(
+      (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
+    );
   }
 
   private isProcessed(element: Element): boolean {
-    return this.processedElements.has(element);
+    return (
+      element instanceof HTMLElement &&
+      element.hasAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR)
+    );
   }
 
   private partitionElements(elements: Element[]): [Element[], Element[]] {
@@ -85,82 +96,10 @@ export class DOMProcessor {
     );
   }
 
-  private processBatch(elements: Element[]): void {
-    elements.forEach((element) => {
-      if (!this.shouldProcess(element)) return;
-
-      const nodesToProcess = Array.from(element.childNodes).filter((node) =>
-        node instanceof Element
-          ? !isBionicSpan(node) && !node.querySelector("strong")
-          : node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
-      );
-
-      if (nodesToProcess.length > 0) {
-        const fragment = document.createDocumentFragment();
-        nodesToProcess.forEach((node) => {
-          if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) {
-            fragment.appendChild(
-              createBionicNode(node.textContent, this.$config),
-            ); // Pass config here
-          } else if (
-            node instanceof Element &&
-            !isBionicSpan(node) &&
-            !node.querySelector("strong")
-          ) {
-            const clone = node.cloneNode(true);
-            if (clone instanceof Element) {
-              this.processElement(clone);
-            }
-            fragment.appendChild(clone);
-          }
-        });
-
-        nodesToProcess.forEach((node) => node.remove());
-        element.appendChild(fragment);
-        this.processedElements.add(element);
-      }
-    });
-  }
-
-  private processElement(element: Element): void {
-    if (!this.shouldProcess(element)) return;
-
-    Array.from(element.children)
-      .filter(
-        (child) =>
-          !this.isProcessed(child) &&
-          !isBionicSpan(child) &&
-          !child.querySelector("strong"),
-      )
-      .forEach((child) => this.processElement(child));
-
-    const textNodes = Array.from(element.childNodes).filter(
-      (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
+  private processNewContent(root: Element): void {
+    const elements = [...root.querySelectorAll("*")].filter(
+      (el) => this.getTextNodes(el).length > 0 && this.shouldProcess(el),
     );
-
-    if (textNodes.length) {
-      const fragment = document.createDocumentFragment();
-      textNodes.forEach((node) => {
-        if (node.textContent) {
-          fragment.appendChild(
-            createBionicNode(node.textContent, this.$config),
-          ); // Pass config here
-        }
-      });
-
-      textNodes.forEach((node) => node.remove());
-      element.appendChild(fragment);
-      this.processedElements.add(element);
-    }
-  }
-
-  private processNewElement(root: Element): void {
-    const elements = [...root.querySelectorAll("*")].filter((el) => {
-      const hasDirectText = Array.from(el.childNodes).some(
-        (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
-      );
-      return hasDirectText && this.shouldProcess(el);
-    });
 
     this.taskBuffer.push(...elements);
     this.flushTaskBuffer();
@@ -180,6 +119,36 @@ export class DOMProcessor {
     this.isProcessing = false;
   }
 
+  private processTextNodes(element: Element): void {
+    if (!this.shouldProcess(element)) return;
+
+    Array.from(element.children)
+      .filter(
+        (child) =>
+          !this.isProcessed(child) &&
+          !isBionicSpan(child) &&
+          !child.querySelector("strong"),
+      )
+      .forEach((child) => this.processTextNodes(child));
+
+    const textNodes = this.getTextNodes(element);
+    if (!textNodes.length) return;
+
+    const fragment = document.createDocumentFragment();
+    textNodes.forEach((node) => {
+      if (node.textContent) {
+        fragment.appendChild(createBionicNode(node.textContent, this.$config));
+      }
+    });
+
+    textNodes.forEach((node) => node.parentNode?.removeChild(node));
+    element.appendChild(fragment);
+
+    if (element instanceof HTMLElement) {
+      element.setAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR, "");
+    }
+  }
+
   private queueTask(task: () => void): void {
     this.taskQueue.push(task);
     if (!this.isProcessing) {
@@ -192,8 +161,13 @@ export class DOMProcessor {
       (entries) =>
         entries.forEach((entry) => {
           if (entry.isIntersecting && entry.target instanceof Element) {
-            this.queueTask(() => this.processElement(entry.target));
+            this.queueTask(() => this.processTextNodes(entry.target));
             this.intersectionObserver.unobserve(entry.target);
+            if (entry.target instanceof HTMLElement) {
+              entry.target.removeAttribute(
+                this.$config.DOM_ATTRS.OBSERVED_ATTR,
+              );
+            }
           }
         }),
       {
@@ -204,34 +178,44 @@ export class DOMProcessor {
 
     this.mutationObserver = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.type === "childList") {
-          mutation.addedNodes.forEach((node) => {
-            if (node instanceof Element && !this.isProcessed(node)) {
-              this.queueTask(() => this.processNewElement(node));
-            }
+        if (mutation.type === "childList" && mutation.removedNodes.length > 0) {
+          mutation.removedNodes.forEach((node) => {
+            node instanceof Element && this.cleanupRemovedElement(node);
           });
-        } else if (
-          mutation.type === "characterData" ||
-          mutation.type === "attributes"
-        ) {
-          const target =
-            mutation.type === "characterData"
-              ? mutation.target.parentElement
-              : mutation.target;
+        }
 
-          if (target instanceof Element && !this.isProcessed(target)) {
-            this.queueTask(() => this.processNewElement(target));
-          }
+        const target =
+          mutation.type === "characterData"
+            ? mutation.target.parentElement
+            : mutation.target instanceof Element
+              ? mutation.target
+              : null;
+
+        if (target instanceof Element && !this.isProcessed(target)) {
+          this.queueTask(() => this.processNewContent(target));
+        } else if (mutation.type === "childList") {
+          mutation.addedNodes.forEach((node) => {
+            node instanceof Element &&
+              !this.isProcessed(node) &&
+              this.queueTask(() => this.processNewContent(node));
+          });
         }
       });
     });
   }
 
   private shouldProcess(element: Element): boolean {
-    return (
-      !this.$config.ignoreTags.has(element.tagName) &&
-      !this.isProcessed(element)
-    );
+    if (!element || !(element instanceof HTMLElement)) return false;
+
+    if (element.hasAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR))
+      return false;
+    if (element.closest(`[${this.$config.DOM_ATTRS.PROCESSED_ATTR}]`))
+      return false;
+
+    if (this.$config.ignoreTags.has(element.tagName)) return false;
+    if (isBionicSpan(element)) return false;
+
+    return true;
   }
 
   private sortElementsByReadingOrder(elements: Element[]): Element[] {
@@ -269,21 +253,7 @@ export class DOMProcessor {
   }
 
   public $start(): void {
-    this.documentWrite = document.write;
-    this.documentWriteln = document.writeln;
-
-    Object.defineProperties(document, {
-      write: {
-        configurable: true,
-        value: this.boundHandleWrite,
-      },
-      writeln: {
-        configurable: true,
-        value: this.boundHandleWrite,
-      },
-    });
-
-    this.processNewElement(document.body);
+    this.processNewContent(document.body);
 
     this.mutationObserver.observe(document.body, {
       ...this.$config.MUTATION.OPTIONS,
@@ -294,16 +264,10 @@ export class DOMProcessor {
   public stop(): void {
     this.intersectionObserver.disconnect();
     this.mutationObserver.disconnect();
-
-    if (this.documentWrite && this.documentWriteln) {
-      Object.defineProperties(document, {
-        write: { value: this.documentWrite },
-        writeln: { value: this.documentWriteln },
-      });
-    }
-
     this.taskQueue = [];
     this.taskBuffer = [];
     this.isProcessing = false;
+
+    this.cleanupRemovedElement(document.body);
   }
 }

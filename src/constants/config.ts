@@ -1,6 +1,9 @@
 import type {
   BionicConfig,
+  BionicRatios,
+  DOMAttributes,
   MutationConfig,
+  ProcessorConfig,
   SyllablePatterns,
 } from "../types/config";
 
@@ -9,8 +12,20 @@ export const pixelRatio = window.devicePixelRatio || 1;
 export const screenWidth = window.innerWidth;
 export const screenHeight = window.innerHeight;
 
+const DOM_ATTRS: DOMAttributes = {
+  OBSERVED_ATTR: "data-readify-observed",
+  PROCESSED_ATTR: "data-readify-processed",
+} as const;
+
 const MUTATION: MutationConfig = {
-  ATTRIBUTES_FILTER: new Set(["class", "style", "contenteditable", "role"]),
+  ATTRIBUTES_FILTER: new Set([
+    "class",
+    "style",
+    "contenteditable",
+    "role",
+    DOM_ATTRS.PROCESSED_ATTR,
+    DOM_ATTRS.OBSERVED_ATTR,
+  ]),
   OPTIONS: {
     attributeOldValue: false,
     attributes: true,
@@ -21,7 +36,7 @@ const MUTATION: MutationConfig = {
   },
 } as const;
 
-const BIONIC_RATIOS = {
+const BIONIC_RATIOS: BionicRatios = {
   COMMON_WORDS: 0.35,
   MULTI_SYLLABLE: {
     FOUR_PLUS: 0.65,
@@ -527,7 +542,9 @@ const BIONIC_COMMON_WORDS = new Set<string>([
   "lot",
 ]);
 const BIONIC: BionicConfig = {
+  boldCommonWords: false,
   boldFactor: 1,
+  boldSingleSyllables: false,
   commonWords: BIONIC_COMMON_WORDS,
   MAX_BOLD_LENGTH: Math.min(5, Math.ceil(screenWidth / 200)),
   MIN_BOLD_LENGTH: 1,
@@ -535,19 +552,12 @@ const BIONIC: BionicConfig = {
   RATIOS: BIONIC_RATIOS,
   SYLLABLE_PATTERNS: BIONIC_SYLLABLE_PATTERNS,
   syllableExceptions: BIONIC_SYLLABLE_EXCEPTIONS,
-  useSyllables: true,
 } as const;
 
-export const PROCESSOR_CONFIG = {
-  BATCH_SIZE: Math.max(
-    20,
-    Math.min(
-      100,
-      Math.floor(50 * (isMobile ? 0.6 : 1) * (pixelRatio > 1 ? 1.2 : 1)),
-    ),
-  ),
+export const PROCESSOR_CONFIG: ProcessorConfig = {
   BIONIC,
   COLUMN_THRESHOLD: Math.max(50, Math.min(200, Math.floor(screenWidth * 0.1))),
+  DOM_ATTRS,
   ignoreTags: new Set([
     "SCRIPT",
     "STYLE",
