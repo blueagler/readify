@@ -56,3 +56,37 @@ export interface BionicRatios {
     readonly SHORT: number;
   };
 }
+
+export interface ElementPosition {
+  $element: Element;
+  $width: number;
+  $x: number;
+  $y: number;
+}
+
+export interface ProcessOptions {
+  isProcessed: boolean;
+  isVisible: boolean;
+  shouldProcess: boolean;
+}
+
+export type ProcessCallback = (element: Element) => void;
+export type ObserverCallback = (entries: IntersectionObserverEntry[]) => void;
+
+export interface ReadifyConfig {
+  boldFactor: number;
+  commonWords: Set<string>;
+}
+
+export interface CustomizedConfig {
+  readonly boldCommonWords: boolean;
+  readonly boldFactor: number;
+  readonly boldSingleSyllables: boolean;
+  readonly commonWords: Set<string>;
+  readonly syllableExceptions: Map<string, number>;
+}
+
+export interface WordAnalysis {
+  boldLength: number;
+  syllables: number;
+}

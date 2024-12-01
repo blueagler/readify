@@ -1,6 +1,5 @@
 import { PROCESSOR_CONFIG } from "../constants/config";
-import { ProcessorConfig } from "../types/config";
-import { CustomizedConfig } from "../types/index";
+import { CustomizedConfig, ProcessorConfig } from "../types";
 import {
   getElementPosition,
   isBionicSpan,

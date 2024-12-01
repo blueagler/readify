@@ -1,4 +1,4 @@
-import { BionicConfig } from "../../types/config";
+import { BionicConfig } from "../../types";
 
 interface WordAnalysis {
   boldLength: number;

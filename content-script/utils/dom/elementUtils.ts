@@ -1,5 +1,5 @@
 import { PROCESSOR_CONFIG, screenHeight } from "../../constants/config";
-import { ElementPosition } from "../../types/core";
+import { ElementPosition } from "../../types";
 
 export function isElementVisible(element: Element): boolean {
   if (!(element instanceof HTMLElement)) return false;

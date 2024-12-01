@@ -1,6 +1,5 @@
-import { ProcessorConfig } from "../types/config";
-import { isSpecialCharacter } from "../utils/text/stringUtils";
-import { splitIntoWords } from "../utils/text/textSplitter";
+import { ProcessorConfig } from "../types";
+import { isSpecialCharacter, splitIntoWords } from "../utils/text/textUtils";
 import { findEnglishRanges } from "../utils/text/textUtils";
 import { analyzeWord } from "../utils/text/wordAnalyzer";
 

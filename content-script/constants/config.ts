@@ -5,7 +5,7 @@ import type {
   MutationConfig,
   ProcessorConfig,
   SyllablePatterns,
-} from "../types/config";
+} from "../types";
 
 export const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 export const pixelRatio = window.devicePixelRatio || 1;
@@ -29,7 +29,7 @@ const MUTATION: MutationConfig = {
   DEBOUNCE_DELAY: 100,
   OPTIONS: {
     attributeOldValue: false,
-    attributes: true,
+    attributes: false,
     characterData: true,
     characterDataOldValue: false,
     childList: true,

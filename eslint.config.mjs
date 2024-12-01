@@ -1,36 +1,36 @@
 // @ts-check
 
-import { config as _config, configs } from 'typescript-eslint';
-import perfectionist from 'eslint-plugin-perfectionist';
+import perfectionist from "eslint-plugin-perfectionist";
+import { config as _config, configs } from "typescript-eslint";
 
 export default _config(
   ...configs.recommended.map((config) => ({
     ...config,
-    files: ['**/*.ts'],
+    files: ["**/*.ts"],
   })),
   {
-    files: ['**/*.ts'],
+    files: ["**/*.ts"],
     languageOptions: {
       parserOptions: {
         project: true,
         tsconfigRootDir: __dirname,
       },
-    }
+    },
   },
   {
     rules: {
       "no-console": "off",
-    }
+    },
   },
   {
     rules: {
+      "@typescript-eslint/no-dynamic-delete": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-for-in-array": "off",
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
-      "@typescript-eslint/no-dynamic-delete": "off",
-      "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-unused-expressions": "off",
+      "@typescript-eslint/no-unused-vars": "off",
     },
   },
   {
@@ -149,10 +149,10 @@ export default _config(
       "perfectionist/sort-objects": [
         "error",
         {
-          groups: ["id", "unknown"],
           customGroups: {
             id: ["id", "name"],
           },
+          groups: ["id", "unknown"],
           order: "asc",
           type: "alphabetical",
         },
@@ -164,6 +164,6 @@ export default _config(
           type: "natural",
         },
       ],
-    }
+    },
   },
 );

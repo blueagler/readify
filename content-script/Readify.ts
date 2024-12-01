@@ -1,4 +1,4 @@
-import type { CustomizedConfig } from "./types/index";
+import type { CustomizedConfig } from "./types";
 
 import { DOMProcessor } from "./core/DOMProcessor";
 
