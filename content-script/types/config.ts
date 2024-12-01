@@ -22,8 +22,8 @@ export interface BionicConfig {
 
 export interface MutationConfig {
   readonly ATTRIBUTES_FILTER: Set<string>;
-  readonly OPTIONS: MutationObserverInit;
   readonly DEBOUNCE_DELAY: number;
+  readonly OPTIONS: MutationObserverInit;
 }
 
 export interface ProcessorConfig {

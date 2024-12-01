@@ -26,6 +26,7 @@ const MUTATION: MutationConfig = {
     DOM_ATTRS.PROCESSED_ATTR,
     DOM_ATTRS.OBSERVED_ATTR,
   ]),
+  DEBOUNCE_DELAY: 100,
   OPTIONS: {
     attributeOldValue: false,
     attributes: true,
@@ -34,7 +35,6 @@ const MUTATION: MutationConfig = {
     childList: true,
     subtree: true,
   },
-  DEBOUNCE_DELAY: 100,
 } as const;
 
 const BIONIC_RATIOS: BionicRatios = {

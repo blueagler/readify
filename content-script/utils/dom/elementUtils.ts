@@ -45,7 +45,10 @@ export function getElementPosition(element: Element): ElementPosition {
   };
 }
 
-export function isInsideIgnoredTag(element: Element, ignoreTags: Set<string>): boolean {
+export function isInsideIgnoredTag(
+  element: Element,
+  ignoreTags: Set<string>,
+): boolean {
   let current = element;
   while (current) {
     if (ignoreTags.has(current.tagName)) {

@@ -9,15 +9,23 @@
     "eslint-plugin-perfectionist": "^3.9.1",
     "prettier": "3.3.3",
     "typescript": "5.8.0-dev.20241106",
-    "typescript-eslint": "8.13.1-alpha.1"
+    "typescript-eslint": "8.13.1-alpha.1",
+    "wxt": "^0.19.17"
   },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "bun link gcc-ts-bundler && bun gcc-ts-bundler --src-dir='./src' --entry_point='./index.ts' --js_output_file='./dist/index.js' --language_out=ES5",
-    "lint": "bun --bun prettier \"src/*.ts\" \"src/**/*.ts\" --write && bun --bun eslint \"src/*.ts\" \"src/**/*.ts\" --fix"
+    "dev": "wxt", 
+    "dev:firefox": "wxt -b firefox", 
+    "build": "wxt build", 
+    "build:firefox": "wxt build -b firefox", 
+    "zip": "wxt zip", 
+    "zip:firefox": "wxt zip -b firefox", 
+    "postinstall": "wxt prepare",
+    "gcc-content": "bun link gcc-ts-bundler && bun gcc-ts-bundler --src_dir='./content-script' --entry_point='./index.ts' --js_output_file='./dist/index.js' --language_out=ES5",
+    "lint": "bun --bun prettier . --write && bun --bun eslint . --fix"
   },
   "sideEffects": [],
   "type": "module"

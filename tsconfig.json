@@ -18,8 +18,8 @@
     "dist",
   ],
   "include": [
-    "src/*.ts",
-    "src/**/*.ts",
+    "content-script/*.ts",
+    "content-script/**/*.ts",
     "eslint.config.mjs"
   ]
 }

@@ -1,6 +1,6 @@
 import { Readify } from "./Readify";
 
-if (typeof window !== "undefined") {
+export const init = () => {
   Readify.init({
     boldSingleSyllables: true,
   });
