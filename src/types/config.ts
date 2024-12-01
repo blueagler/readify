@@ -23,6 +23,7 @@ export interface BionicConfig {
 export interface MutationConfig {
   readonly ATTRIBUTES_FILTER: Set<string>;
   readonly OPTIONS: MutationObserverInit;
+  readonly DEBOUNCE_DELAY: number;
 }
 
 export interface ProcessorConfig {
@@ -33,10 +34,7 @@ export interface ProcessorConfig {
   readonly ignoreTags: Set<string>;
   readonly INTERSECTION_MARGIN: string;
   readonly INTERSECTION_THRESHOLD: number;
-  readonly MUTATION: {
-    readonly ATTRIBUTES_FILTER: Set<string>;
-    readonly OPTIONS: MutationObserverInit;
-  };
+  readonly MUTATION: MutationConfig;
   readonly VIEWPORT_MARGIN: number;
 }
 

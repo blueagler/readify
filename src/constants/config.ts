@@ -34,6 +34,7 @@ const MUTATION: MutationConfig = {
     childList: true,
     subtree: true,
   },
+  DEBOUNCE_DELAY: 100,
 } as const;
 
 const BIONIC_RATIOS: BionicRatios = {
