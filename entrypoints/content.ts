@@ -1,12 +1,11 @@
 import { defineContentScript } from "wxt/sandbox";
 //@ts-expect-error - This is a fake import
-import { start, stop } from "../dist/_index.js";
+import { start } from "../dist/_index.js";
 
 export default defineContentScript({
   allFrames: true,
-  main(ctx) {
-    ctx.addEventListener(document, "DOMContentLoaded", start);
-    ctx.onInvalidated(stop);
+  main() {
+    document.addEventListener("DOMContentLoaded", start);
   },
   matches: ["<all_urls>"],
   registration: "manifest",
