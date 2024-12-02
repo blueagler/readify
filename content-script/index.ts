@@ -10,5 +10,5 @@ export const start = () => {
 };
 
 export const stop = () => {
-  instance?.stop();
+  instance?.$stop();
 };

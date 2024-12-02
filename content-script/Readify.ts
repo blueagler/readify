@@ -33,7 +33,7 @@ export class Readify {
     this.processor.$start();
   }
 
-  public stop(): void {
-    this.processor.stop();
+  public $stop(): void {
+    this.processor.$stop();
   }
 }

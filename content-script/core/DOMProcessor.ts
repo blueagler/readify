@@ -386,7 +386,7 @@ export class DOMProcessor {
     this.processNewContent(document.body);
     this.mutationObserver.observe(document.body, this.$config.MUTATION.OPTIONS);
   }
-  public stop(): void {
+  public $stop(): void {
     this.intersectionObserver.disconnect();
     this.mutationObserver.disconnect();
     this.taskQueue = [];
