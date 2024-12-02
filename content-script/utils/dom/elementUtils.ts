@@ -1,8 +1,4 @@
-import {
-  DOM_ATTRIBUTES,
-  PROCESSOR_CONFIG,
-  screenHeight,
-} from "../../constants/config";
+import { PROCESSOR_CONFIG, screenHeight } from "../../constants/config";
 import { ElementPosition } from "../../types";
 
 export function isElementVisible(element: Element): boolean {
@@ -21,26 +17,6 @@ export function isElementVisible(element: Element): boolean {
     rect.height > 0 &&
     rect.width > 0
   );
-}
-
-export function isBionicSpan(element: Element): boolean {
-  if (!(element instanceof HTMLElement)) return false;
-
-  if (element.hasAttribute(DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE)) return true;
-
-  if (element.parentElement?.hasAttribute(DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE))
-    return true;
-
-  if (element instanceof HTMLSpanElement) {
-    if (
-      element.firstElementChild instanceof HTMLElement &&
-      element.firstElementChild.tagName === "STRONG"
-    ) {
-      return true;
-    }
-  }
-
-  return false;
 }
 
 export function getElementPosition(element: Element): ElementPosition {

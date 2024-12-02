@@ -1,8 +1,7 @@
-import { DOM_ATTRIBUTES, PROCESSOR_CONFIG } from "../constants/config";
+import { PROCESSOR_CONFIG } from "../constants/config";
 import { CustomizedConfig, ElementCheckType, ProcessorConfig } from "../types";
 import {
   getElementPosition,
-  isBionicSpan,
   isElementVisible,
 } from "../utils/dom/elementUtils";
 import { createBionicNode } from "./TextTransformer";
@@ -17,6 +16,8 @@ export class DOMProcessor {
   private isAnimationScheduled = false;
   private isProcessing = false;
   private mutationObserver!: MutationObserver;
+  private observedElements = new WeakSet<Element>();
+  private processedElements = new WeakSet<Element>();
   private processingSet = new Set<Element>();
   private taskBuffer: Element[] = [];
   private taskQueue: (() => void)[] = [];
@@ -77,25 +78,26 @@ export class DOMProcessor {
     );
   }
   private cleanupRemovedElement(root: Element): void {
-    if (root instanceof HTMLElement) {
-      root.removeAttribute(DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE);
-      root.removeAttribute(DOM_ATTRIBUTES.OBSERVED_ATTRIBUTE);
-    }
+    this.observedElements.delete(root);
+    this.processedElements.delete(root);
+
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
       acceptNode: (node): number => {
         if (!(node instanceof HTMLElement)) return NodeFilter.FILTER_SKIP;
-        return node.hasAttribute(DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE) ||
-          node.hasAttribute(DOM_ATTRIBUTES.OBSERVED_ATTRIBUTE)
-          ? NodeFilter.FILTER_ACCEPT
-          : NodeFilter.FILTER_SKIP;
+        if (
+          this.processedElements.has(node) ||
+          this.observedElements.has(node)
+        ) {
+          return NodeFilter.FILTER_ACCEPT;
+        }
+        return NodeFilter.FILTER_SKIP;
       },
     });
-    let node: Element | null;
+
+    let node;
     while ((node = walker.nextNode() as Element)) {
-      if (node instanceof HTMLElement) {
-        node.removeAttribute(DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE);
-        node.removeAttribute(DOM_ATTRIBUTES.OBSERVED_ATTRIBUTE);
-      }
+      this.processedElements.delete(node);
+      this.observedElements.delete(node);
     }
   }
   private filterRedundantElements(elements: Element[]): Element[] {
@@ -116,12 +118,34 @@ export class DOMProcessor {
     hiddenElements.forEach((element) => {
       if (
         element instanceof HTMLElement &&
-        !element.hasAttribute(DOM_ATTRIBUTES.OBSERVED_ATTRIBUTE)
+        !this.observedElements.has(element)
       ) {
-        element.setAttribute(DOM_ATTRIBUTES.OBSERVED_ATTRIBUTE, "");
+        this.observedElements.add(element);
         this.intersectionObserver.observe(element);
       }
     });
+  }
+  private isBionicSpan(element: Element): boolean {
+    if (!(element instanceof HTMLElement)) return false;
+
+    if (this.processedElements.has(element)) return true;
+
+    if (
+      element.parentElement &&
+      this.processedElements.has(element.parentElement)
+    )
+      return true;
+
+    if (element instanceof HTMLSpanElement) {
+      if (
+        element.firstElementChild instanceof HTMLElement &&
+        element.firstElementChild.tagName === "STRONG"
+      ) {
+        return true;
+      }
+    }
+
+    return false;
   }
   private isChildOfPendingElements(
     element: Element,
@@ -130,6 +154,20 @@ export class DOMProcessor {
     return elements.some(
       (pending) => pending.contains(element) && pending !== element,
     );
+  }
+  private isContentProcessed(node: Node): boolean {
+    if (node instanceof Element) {
+      if (this.processedElements.has(node)) return true;
+    }
+
+    // Check if parent or ancestors are processed
+    let parent = node.parentElement;
+    while (parent) {
+      if (this.processedElements.has(parent)) return true;
+      parent = parent.parentElement;
+    }
+
+    return false;
   }
   private isEditableOrInteractive(element: Element): boolean {
     return this.checkElementType(element, ElementCheckType.Editable);
@@ -144,10 +182,7 @@ export class DOMProcessor {
     return this.checkElementType(element, ElementCheckType.Ignored);
   }
   private isProcessed(element: Element): boolean {
-    return (
-      element instanceof HTMLElement &&
-      element.hasAttribute(DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE)
-    );
+    return this.processedElements.has(element);
   }
   private partitionElements(elements: Element[]): [Element[], Element[]] {
     return elements.reduce<[Element[], Element[]]>(
@@ -159,49 +194,99 @@ export class DOMProcessor {
     );
   }
   private processNewContent(root: Element): void {
+    if (!root || this.isIgnored(root) || this.processingSet.has(root)) return;
+
     queueMicrotask(() => {
-      if (this.isIgnored(root) || this.processingSet.has(root)) {
-        return;
-      }
       const elements = new Set<Element>();
       const elementsToObserve = new Set<Element>();
-      const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
-        acceptNode: (node): number => {
-          if (!(node instanceof HTMLElement)) return NodeFilter.FILTER_SKIP;
-          if (this.isIgnored(node) || this.processingSet.has(node)) {
-            return NodeFilter.FILTER_REJECT;
-          }
-          if (this.shouldProcess(node)) {
-            const hasDirectTextNode = Array.from(node.childNodes).some(
-              (child) =>
-                child.nodeType === Node.TEXT_NODE && child.textContent?.trim(),
-            );
-            if (hasDirectTextNode) {
-              if (isElementVisible(node)) {
-                elements.add(node);
-              } else {
-                elementsToObserve.add(node);
-              }
+      const processedParents = new Set<Element>();
+
+      const walker = document.createTreeWalker(
+        root,
+        NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
+        {
+          acceptNode: (node): number => {
+            if (!node || this.isContentProcessed(node)) {
               return NodeFilter.FILTER_REJECT;
             }
-          }
-          return NodeFilter.FILTER_ACCEPT;
+
+            if (node instanceof Element) {
+              const parent = node.parentElement;
+              if (parent && processedParents.has(parent)) {
+                return NodeFilter.FILTER_REJECT;
+              }
+            }
+
+            if (node.nodeType === Node.TEXT_NODE) {
+              const parent = node.parentElement;
+              if (!parent) return NodeFilter.FILTER_REJECT;
+
+              if (
+                processedParents.has(parent) ||
+                this.processingSet.has(parent) ||
+                this.isIgnored(parent) ||
+                this.isEditableOrInteractive(parent) ||
+                this.isHighPerformanceElement(parent) ||
+                this.isBionicSpan(parent)
+              ) {
+                return NodeFilter.FILTER_REJECT;
+              }
+
+              const text = node.textContent?.trim();
+              if (!text || /^[\s…]+$/.test(text)) {
+                return NodeFilter.FILTER_REJECT;
+              }
+              processedParents.add(parent);
+              if (isElementVisible(parent)) {
+                elements.add(parent);
+              } else {
+                elementsToObserve.add(parent);
+              }
+              return NodeFilter.FILTER_SKIP;
+            }
+
+            if (!(node instanceof HTMLElement)) return NodeFilter.FILTER_SKIP;
+
+            if (
+              this.isIgnored(node) ||
+              this.processingSet.has(node) ||
+              this.isEditableOrInteractive(node) ||
+              this.isHighPerformanceElement(node) ||
+              this.isBionicSpan(node)
+            ) {
+              return NodeFilter.FILTER_REJECT;
+            }
+
+            return NodeFilter.FILTER_ACCEPT;
+          },
         },
-      });
+      );
+
       while (walker.nextNode()) {}
+
+      if (elements.size > 0) {
+        const uniqueElements = Array.from(elements).filter((element) => {
+          let parent = element.parentElement;
+          while (parent) {
+            if (elements.has(parent)) return false;
+            parent = parent.parentElement;
+          }
+          return true;
+        });
+
+        this.taskBuffer.push(...uniqueElements);
+        this.flushTaskBuffer();
+      }
+
       elementsToObserve.forEach((element) => {
         if (
           element instanceof HTMLElement &&
-          !element.hasAttribute(DOM_ATTRIBUTES.OBSERVED_ATTRIBUTE)
+          !this.observedElements.has(element)
         ) {
-          element.setAttribute(DOM_ATTRIBUTES.OBSERVED_ATTRIBUTE, "");
+          this.observedElements.add(element);
           this.intersectionObserver.observe(element);
         }
       });
-      if (elements.size > 0) {
-        this.taskBuffer.push(...elements);
-        this.flushTaskBuffer();
-      }
     });
   }
   private async processQueue(): Promise<void> {
@@ -217,30 +302,47 @@ export class DOMProcessor {
     this.isProcessing = false;
   }
   private processTextNodes(element: Element): void {
-    if (!this.shouldProcess(element)) return;
+    if (!element || !this.shouldProcess(element)) return;
     if (this.processingSet.has(element)) return;
+
     this.processingSet.add(element);
-    try {
-      const textNodes = Array.from(element.childNodes).filter(
-        (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
-      );
-      if (textNodes.length) {
-        textNodes.forEach((node) => {
-          if (node.textContent) {
-            const processedNode = createBionicNode(
-              node.textContent,
-              this.$config,
-            );
-            node.parentNode?.replaceChild(processedNode, node);
-          }
-        });
-        if (element instanceof HTMLElement) {
-          element.setAttribute(DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE, "");
+
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, {
+      acceptNode: (node): number => {
+        if (!node.textContent?.trim()) return NodeFilter.FILTER_REJECT;
+        if (this.isContentProcessed(node)) return NodeFilter.FILTER_REJECT;
+        if (/^[\s…]+$/.test(node.textContent)) return NodeFilter.FILTER_REJECT;
+
+        const parent = node.parentElement;
+        if (!parent) return NodeFilter.FILTER_REJECT;
+
+        if (
+          this.isIgnored(parent) ||
+          this.isEditableOrInteractive(parent) ||
+          this.isHighPerformanceElement(parent) ||
+          this.isBionicSpan(parent)
+        ) {
+          return NodeFilter.FILTER_REJECT;
         }
-      }
-    } finally {
-      this.processingSet.delete(element);
+
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+
+    const textNodesToProcess: Text[] = [];
+    let textNode;
+    while ((textNode = walker.nextNode() as Text)) {
+      textNodesToProcess.push(textNode);
     }
+
+    textNodesToProcess.forEach((node) => {
+      if (!node.textContent || !node.parentNode) return;
+      const processedNode = createBionicNode(node.textContent, this.$config);
+      node.parentNode.replaceChild(processedNode, node);
+    });
+
+    this.processedElements.add(element);
+    this.processingSet.delete(element);
   }
   private queueTask(task: () => void): void {
     this.taskQueue.push(task);
@@ -263,10 +365,8 @@ export class DOMProcessor {
           if (isElementVisible(element)) {
             this.processTextNodes(element);
           } else {
-            if (element instanceof HTMLElement) {
-              element.setAttribute(DOM_ATTRIBUTES.OBSERVED_ATTRIBUTE, "");
-              this.intersectionObserver.observe(element);
-            }
+            this.observedElements.add(element);
+            this.intersectionObserver.observe(element);
           }
           index++;
           if (performance.now() - startTime > 16) {
@@ -293,13 +393,11 @@ export class DOMProcessor {
           if (
             entry.isIntersecting &&
             entry.target instanceof Element &&
-            !this.isProcessed(entry.target)
+            !this.processedElements.has(entry.target)
           ) {
             this.queueTask(() => this.processTextNodes(entry.target));
             this.intersectionObserver.unobserve(entry.target);
-            if (entry.target instanceof HTMLElement) {
-              entry.target.removeAttribute(DOM_ATTRIBUTES.OBSERVED_ATTRIBUTE);
-            }
+            this.observedElements.delete(entry.target);
           }
         }),
       {
@@ -342,16 +440,28 @@ export class DOMProcessor {
   }
   private shouldProcess(element: Element): boolean {
     if (!element || !(element instanceof HTMLElement)) return false;
-    if (element.hasAttribute(DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE)) return false;
-    if (element.closest(`[${DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE}]`))
-      return false;
+
+    if (this.isContentProcessed(element)) return false;
+
     if (this.isEditableOrInteractive(element)) return false;
     if (this.isHighPerformanceElement(element)) return false;
     if (this.isIgnored(element)) return false;
     if (this.isHidden(element)) return false;
-    if (isBionicSpan(element)) return false;
+    if (this.isBionicSpan(element)) return false;
+
+    const hasUnprocessedText = Array.from(element.childNodes).some(
+      (node) =>
+        node.nodeType === Node.TEXT_NODE &&
+        node.textContent?.trim() &&
+        !/^[\s…]+$/.test(node.textContent) &&
+        !this.isContentProcessed(node),
+    );
+
+    if (!hasUnprocessedText) return false;
+
     const text = element.textContent || "";
     if (!text.trim() || !/[a-zA-Z]/.test(text)) return false;
+
     return true;
   }
   private sortElementsByReadingOrder(elements: Element[]): Element[] {

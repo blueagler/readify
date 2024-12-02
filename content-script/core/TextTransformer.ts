@@ -1,4 +1,4 @@
-import { DOM_ATTRIBUTES, STYLE_CLASSES } from "../constants/config";
+import { STYLE_CLASSES } from "../constants/config";
 import { ProcessorConfig } from "../types";
 import { isSpecialCharacter, splitIntoWords } from "../utils/text/textUtils";
 import { findEnglishRanges } from "../utils/text/textUtils";
@@ -20,7 +20,6 @@ export function createBionicNode(
 
   const fragment = document.createDocumentFragment();
   const containerSpan = document.createElement("span");
-  containerSpan.setAttribute(DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE, "");
 
   const englishRanges = findEnglishRanges(text).filter(({ $end, $start }) => {
     const word = text.slice($start, $end).trim();

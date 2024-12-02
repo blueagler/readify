@@ -18,11 +18,6 @@ export const STYLE_CLASSES = {
   BIONIC_SALIENCED: "readify-bionic-salienced",
 };
 
-export const DOM_ATTRIBUTES = {
-  OBSERVED_ATTRIBUTE: "data-readify-observed",
-  PROCESSED_ATTRIBUTE: "data-readify-processed",
-};
-
 const MUTATION: MutationConfig = {
   DEBOUNCE_DELAY: 100,
   OPTIONS: {
