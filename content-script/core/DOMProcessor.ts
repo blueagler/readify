@@ -160,7 +160,6 @@ export class DOMProcessor {
       if (this.processedElements.has(node)) return true;
     }
 
-    // Check if parent or ancestors are processed
     let parent = node.parentElement;
     while (parent) {
       if (this.processedElements.has(parent)) return true;
@@ -199,7 +198,7 @@ export class DOMProcessor {
     queueMicrotask(() => {
       const elements = new Set<Element>();
       const elementsToObserve = new Set<Element>();
-      const processedParents = new Set<Element>();
+      const processedParents = new WeakSet<Element>();
 
       const walker = document.createTreeWalker(
         root,
@@ -302,7 +301,7 @@ export class DOMProcessor {
     this.isProcessing = false;
   }
   private processTextNodes(element: Element): void {
-    if (!element || !this.shouldProcess(element)) return;
+    if (!this.shouldProcess(element)) return;
     if (this.processingSet.has(element)) return;
 
     this.processingSet.add(element);
@@ -439,15 +438,17 @@ export class DOMProcessor {
     });
   }
   private shouldProcess(element: Element): boolean {
-    if (!element || !(element instanceof HTMLElement)) return false;
+    if (!(element instanceof HTMLElement)) return false;
 
     if (this.isContentProcessed(element)) return false;
 
-    if (this.isEditableOrInteractive(element)) return false;
-    if (this.isHighPerformanceElement(element)) return false;
-    if (this.isIgnored(element)) return false;
-    if (this.isHidden(element)) return false;
-    if (this.isBionicSpan(element)) return false;
+    if (
+      this.isEditableOrInteractive(element) ||
+      this.isHighPerformanceElement(element) ||
+      this.isIgnored(element) ||
+      this.isHidden(element)
+    )
+      return false;
 
     const hasUnprocessedText = Array.from(element.childNodes).some(
       (node) =>

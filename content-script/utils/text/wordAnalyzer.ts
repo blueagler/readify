@@ -79,7 +79,7 @@ function getDynamicBoldLength(
 const analysisCache = new WeakMap<BionicConfig, Map<string, WordAnalysis>>();
 
 export function analyzeWord(word: string, config: BionicConfig): WordAnalysis {
-  if (!word || typeof word !== "string") {
+  if (!word) {
     return { boldLength: 0, isCommonWord: false, syllables: 0 };
   }
 

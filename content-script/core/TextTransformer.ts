@@ -8,7 +8,7 @@ export function createBionicNode(
   text: string,
   config: ProcessorConfig,
 ): DocumentFragment {
-  if (typeof text !== "string" || !text.trim()) {
+  if (!text.trim()) {
     return document.createDocumentFragment();
   }
 
