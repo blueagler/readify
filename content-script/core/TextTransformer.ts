@@ -8,7 +8,7 @@ export function createBionicNode(
   text: string,
   config: ProcessorConfig,
 ): DocumentFragment {
-  if (!text.trim()) {
+  if (!text?.trim()) {
     return document.createDocumentFragment();
   }
 
@@ -37,38 +37,35 @@ export function createBionicNode(
   let lastEnd = 0;
   englishRanges.forEach(({ $end, $start }) => {
     if ($start > lastEnd) {
-      containerSpan.appendChild(
-        document.createTextNode(text.slice(lastEnd, $start)),
-      );
+      containerSpan.append(text.slice(lastEnd, $start));
     }
 
-    const englishText = text.slice($start, $end);
-    const words = splitIntoWords(englishText);
-    words.forEach((word) => {
+    splitIntoWords(text.slice($start, $end)).forEach((word) => {
       if (!word.trim() || isSpecialCharacter(word)) {
-        containerSpan.appendChild(document.createTextNode(word));
+        containerSpan.append(word);
+        return;
+      }
+
+      const { boldLength } = analyzeWord(word, config.BIONIC);
+      if (boldLength === 0) {
+        containerSpan.append(word);
         return;
       }
 
       const wordSpan = document.createElement("span");
-      const { boldLength } = analyzeWord(word, config.BIONIC);
+      const strong = document.createElement("strong");
+      strong.className = STYLE_CLASSES.BIONIC_SALIENCED;
+      strong.textContent = word.slice(0, boldLength);
+      wordSpan.append(strong);
 
-      if (boldLength === 0) {
-        wordSpan.textContent = word;
-      } else {
-        const strong = document.createElement("strong");
-        strong.className = STYLE_CLASSES.BIONIC_SALIENCED;
-        strong.textContent = word.slice(0, boldLength);
-        wordSpan.appendChild(strong);
-        if (boldLength < word.length) {
-          const remaining = document.createElement("span");
-          remaining.className = STYLE_CLASSES.BIONIC_IGNORED;
-          remaining.textContent = word.slice(boldLength);
-          wordSpan.appendChild(remaining);
-        }
+      if (boldLength < word.length) {
+        const remaining = document.createElement("span");
+        remaining.className = STYLE_CLASSES.BIONIC_IGNORED;
+        remaining.textContent = word.slice(boldLength);
+        wordSpan.append(remaining);
       }
 
-      containerSpan.appendChild(wordSpan);
+      containerSpan.append(wordSpan);
     });
 
     lastEnd = $end;

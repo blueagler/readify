@@ -83,40 +83,29 @@ export function analyzeWord(word: string, config: BionicConfig): WordAnalysis {
     return { boldLength: 0, isCommonWord: false, syllables: 0 };
   }
 
-  let configCache = analysisCache.get(config);
-  if (configCache) {
-    const cached = configCache.get(word);
-    if (cached) return cached;
-  } else {
-    configCache = new Map();
-    analysisCache.set(config, configCache);
-  }
+  const configCache = analysisCache.get(config) ?? new Map();
+  const cached = configCache.get(word);
+  if (cached) return cached;
 
-  const length = word.length;
-  if (length === 0) {
-    return { boldLength: 0, isCommonWord: false, syllables: 0 };
+  if (!analysisCache.has(config)) {
+    analysisCache.set(config, configCache);
   }
 
   const lowerWord = word.toLowerCase();
   const isCommon = config.commonWords.has(lowerWord);
   const syllables = countSyllables(word, config);
+  const length = word.length;
 
-  let boldLength: number;
-
-  if (isCommon) {
-    boldLength = config.boldCommonWords
+  const boldLength = isCommon
+    ? config.boldCommonWords
       ? Math.max(
           1,
           Math.ceil(length * config.RATIOS.COMMON_WORDS * config.boldFactor),
         )
-      : 0;
-  } else {
-    if (syllables === 1 && !config.boldSingleSyllables) {
-      boldLength = 0;
-    } else {
-      boldLength = Math.max(1, getDynamicBoldLength(length, syllables, config));
-    }
-  }
+      : 0
+    : syllables === 1 && !config.boldSingleSyllables
+      ? 0
+      : Math.max(1, getDynamicBoldLength(length, syllables, config));
 
   const result = {
     boldLength: Math.min(config.MAX_BOLD_LENGTH, Math.min(length, boldLength)),

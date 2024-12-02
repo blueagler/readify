@@ -301,43 +301,28 @@ export class DOMProcessor {
     this.isProcessing = false;
   }
   private processTextNodes(element: Element): void {
-    if (!this.shouldProcess(element)) return;
-    if (this.processingSet.has(element)) return;
+    if (!this.shouldProcess(element) || this.processingSet.has(element)) return;
 
     this.processingSet.add(element);
+    const nodes = [];
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
 
-    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, {
-      acceptNode: (node): number => {
-        if (!node.textContent?.trim()) return NodeFilter.FILTER_REJECT;
-        if (this.isContentProcessed(node)) return NodeFilter.FILTER_REJECT;
-        if (/^[\s…]+$/.test(node.textContent)) return NodeFilter.FILTER_REJECT;
-
-        const parent = node.parentElement;
-        if (!parent) return NodeFilter.FILTER_REJECT;
-
-        if (
-          this.isIgnored(parent) ||
-          this.isEditableOrInteractive(parent) ||
-          this.isHighPerformanceElement(parent) ||
-          this.isBionicSpan(parent)
-        ) {
-          return NodeFilter.FILTER_REJECT;
-        }
-
-        return NodeFilter.FILTER_ACCEPT;
-      },
-    });
-
-    const textNodesToProcess: Text[] = [];
-    let textNode;
-    while ((textNode = walker.nextNode() as Text)) {
-      textNodesToProcess.push(textNode);
+    let node;
+    while ((node = walker.nextNode() as Text)) {
+      if (
+        node.textContent?.trim() &&
+        !this.isContentProcessed(node) &&
+        !/^[\s…]+$/.test(node.textContent) &&
+        node.parentElement &&
+        !this.isIgnored(node.parentElement)
+      ) {
+        nodes.push(node);
+      }
     }
 
-    textNodesToProcess.forEach((node) => {
-      if (!node.textContent || !node.parentNode) return;
-      const processedNode = createBionicNode(node.textContent, this.$config);
-      node.parentNode.replaceChild(processedNode, node);
+    nodes.forEach((node) => {
+      const processedNode = createBionicNode(node.textContent!, this.$config);
+      node.parentNode!.replaceChild(processedNode, node);
     });
 
     this.processedElements.add(element);
@@ -438,32 +423,29 @@ export class DOMProcessor {
     });
   }
   private shouldProcess(element: Element): boolean {
-    if (!(element instanceof HTMLElement)) return false;
-
-    if (this.isContentProcessed(element)) return false;
-
     if (
-      this.isEditableOrInteractive(element) ||
-      this.isHighPerformanceElement(element) ||
-      this.isIgnored(element) ||
-      this.isHidden(element)
-    )
+      !(element instanceof HTMLElement) ||
+      this.isContentProcessed(element) ||
+      this.checkElementType(element, ElementCheckType.Ignored) ||
+      this.checkElementType(element, ElementCheckType.Editable) ||
+      this.checkElementType(element, ElementCheckType.Hidden) ||
+      this.checkElementType(element, ElementCheckType.HighPerformance)
+    ) {
       return false;
-
-    const hasUnprocessedText = Array.from(element.childNodes).some(
-      (node) =>
-        node.nodeType === Node.TEXT_NODE &&
-        node.textContent?.trim() &&
-        !/^[\s…]+$/.test(node.textContent) &&
-        !this.isContentProcessed(node),
-    );
-
-    if (!hasUnprocessedText) return false;
+    }
 
     const text = element.textContent || "";
-    if (!text.trim() || !/[a-zA-Z]/.test(text)) return false;
-
-    return true;
+    return (
+      text.trim().length > 0 &&
+      /[a-zA-Z]/.test(text) &&
+      Array.from(element.childNodes).some(
+        (node) =>
+          node.nodeType === Node.TEXT_NODE &&
+          node.textContent?.trim() &&
+          !/^[\s…]+$/.test(node.textContent) &&
+          !this.isContentProcessed(node),
+      )
+    );
   }
   private sortElementsByReadingOrder(elements: Element[]): Element[] {
     if (elements.length <= 1) return elements;
