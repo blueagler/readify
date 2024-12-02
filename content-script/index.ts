@@ -8,3 +8,7 @@ export const start = () => {
     boldSingleSyllables: true,
   });
 };
+
+export const stop = () => {
+  instance?.stop();
+};

@@ -4,8 +4,9 @@ import { start } from "../dist/_index.js";
 
 export default defineContentScript({
   allFrames: true,
-  main() {
-    document.addEventListener("DOMContentLoaded", start);
+  main(ctx) {
+    ctx.addEventListener(document, "DOMContentLoaded", start);
+    ctx.onInvalidated(stop);
   },
   matches: ["<all_urls>"],
   registration: "manifest",
