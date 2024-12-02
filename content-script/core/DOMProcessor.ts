@@ -18,7 +18,7 @@ export class DOMProcessor {
   private mutationObserver!: MutationObserver;
   private observedElements = new WeakSet<Element>();
   private processedElements = new WeakSet<Element>();
-  private processingSet = new Set<Element>();
+  private processingSet = new WeakSet<Element>();
   private taskBuffer: Element[] = [];
   private taskQueue: (() => void)[] = [];
   constructor(config?: Partial<CustomizedConfig>) {
@@ -390,7 +390,7 @@ export class DOMProcessor {
       },
     );
     this.mutationObserver = new MutationObserver((mutations) => {
-      const debounceSet = new Set<Element>();
+      const debounceSet = new WeakSet<Element>();
       mutations.forEach((mutation) => {
         const target = mutation.target;
         if (!target) return;
