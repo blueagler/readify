@@ -1,10 +1,13 @@
-import { PROCESSOR_CONFIG, screenHeight } from "../../constants/config";
+import {
+  DOM_ATTRIBUTES,
+  PROCESSOR_CONFIG,
+  screenHeight,
+} from "../../constants/config";
 import { ElementPosition } from "../../types";
 
 export function isElementVisible(element: Element): boolean {
   if (!(element instanceof HTMLElement)) return false;
 
-  // Check if element is actually rendered
   const style = window.getComputedStyle(element);
   if (style.display === "none" || style.visibility === "hidden") {
     return false;
@@ -12,7 +15,6 @@ export function isElementVisible(element: Element): boolean {
 
   const rect = element.getBoundingClientRect();
 
-  // Check if element is within viewport with margin
   return (
     rect.top <= screenHeight + PROCESSOR_CONFIG.VIEWPORT_MARGIN &&
     rect.bottom >= -PROCESSOR_CONFIG.VIEWPORT_MARGIN &&
@@ -24,14 +26,9 @@ export function isElementVisible(element: Element): boolean {
 export function isBionicSpan(element: Element): boolean {
   if (!(element instanceof HTMLElement)) return false;
 
-  if (element.hasAttribute(PROCESSOR_CONFIG.DOM_ATTRS.PROCESSED_ATTR))
-    return true;
+  if (element.hasAttribute(DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE)) return true;
 
-  if (
-    element.parentElement?.hasAttribute(
-      PROCESSOR_CONFIG.DOM_ATTRS.PROCESSED_ATTR,
-    )
-  )
+  if (element.parentElement?.hasAttribute(DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE))
     return true;
 
   if (element instanceof HTMLSpanElement) {

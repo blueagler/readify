@@ -1,4 +1,4 @@
-import { PROCESSOR_CONFIG } from "../constants/config";
+import { DOM_ATTRIBUTES, PROCESSOR_CONFIG } from "../constants/config";
 import { CustomizedConfig, ElementCheckType, ProcessorConfig } from "../types";
 import {
   getElementPosition,
@@ -78,14 +78,14 @@ export class DOMProcessor {
   }
   private cleanupRemovedElement(root: Element): void {
     if (root instanceof HTMLElement) {
-      root.removeAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR);
-      root.removeAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR);
+      root.removeAttribute(DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE);
+      root.removeAttribute(DOM_ATTRIBUTES.OBSERVED_ATTRIBUTE);
     }
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
       acceptNode: (node): number => {
         if (!(node instanceof HTMLElement)) return NodeFilter.FILTER_SKIP;
-        return node.hasAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR) ||
-          node.hasAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR)
+        return node.hasAttribute(DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE) ||
+          node.hasAttribute(DOM_ATTRIBUTES.OBSERVED_ATTRIBUTE)
           ? NodeFilter.FILTER_ACCEPT
           : NodeFilter.FILTER_SKIP;
       },
@@ -93,8 +93,8 @@ export class DOMProcessor {
     let node: Element | null;
     while ((node = walker.nextNode() as Element)) {
       if (node instanceof HTMLElement) {
-        node.removeAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR);
-        node.removeAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR);
+        node.removeAttribute(DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE);
+        node.removeAttribute(DOM_ATTRIBUTES.OBSERVED_ATTRIBUTE);
       }
     }
   }
@@ -116,9 +116,9 @@ export class DOMProcessor {
     hiddenElements.forEach((element) => {
       if (
         element instanceof HTMLElement &&
-        !element.hasAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR)
+        !element.hasAttribute(DOM_ATTRIBUTES.OBSERVED_ATTRIBUTE)
       ) {
-        element.setAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR, "");
+        element.setAttribute(DOM_ATTRIBUTES.OBSERVED_ATTRIBUTE, "");
         this.intersectionObserver.observe(element);
       }
     });
@@ -146,7 +146,7 @@ export class DOMProcessor {
   private isProcessed(element: Element): boolean {
     return (
       element instanceof HTMLElement &&
-      element.hasAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR)
+      element.hasAttribute(DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE)
     );
   }
   private partitionElements(elements: Element[]): [Element[], Element[]] {
@@ -192,9 +192,9 @@ export class DOMProcessor {
       elementsToObserve.forEach((element) => {
         if (
           element instanceof HTMLElement &&
-          !element.hasAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR)
+          !element.hasAttribute(DOM_ATTRIBUTES.OBSERVED_ATTRIBUTE)
         ) {
-          element.setAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR, "");
+          element.setAttribute(DOM_ATTRIBUTES.OBSERVED_ATTRIBUTE, "");
           this.intersectionObserver.observe(element);
         }
       });
@@ -235,7 +235,7 @@ export class DOMProcessor {
           }
         });
         if (element instanceof HTMLElement) {
-          element.setAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR, "");
+          element.setAttribute(DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE, "");
         }
       }
     } finally {
@@ -264,7 +264,7 @@ export class DOMProcessor {
             this.processTextNodes(element);
           } else {
             if (element instanceof HTMLElement) {
-              element.setAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR, "");
+              element.setAttribute(DOM_ATTRIBUTES.OBSERVED_ATTRIBUTE, "");
               this.intersectionObserver.observe(element);
             }
           }
@@ -298,9 +298,7 @@ export class DOMProcessor {
             this.queueTask(() => this.processTextNodes(entry.target));
             this.intersectionObserver.unobserve(entry.target);
             if (entry.target instanceof HTMLElement) {
-              entry.target.removeAttribute(
-                this.$config.DOM_ATTRS.OBSERVED_ATTR,
-              );
+              entry.target.removeAttribute(DOM_ATTRIBUTES.OBSERVED_ATTRIBUTE);
             }
           }
         }),
@@ -344,9 +342,8 @@ export class DOMProcessor {
   }
   private shouldProcess(element: Element): boolean {
     if (!element || !(element instanceof HTMLElement)) return false;
-    if (element.hasAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR))
-      return false;
-    if (element.closest(`[${this.$config.DOM_ATTRS.PROCESSED_ATTR}]`))
+    if (element.hasAttribute(DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE)) return false;
+    if (element.closest(`[${DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE}]`))
       return false;
     if (this.isEditableOrInteractive(element)) return false;
     if (this.isHighPerformanceElement(element)) return false;

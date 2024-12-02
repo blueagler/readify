@@ -28,18 +28,12 @@ export interface MutationConfig {
 export interface ProcessorConfig {
   readonly BIONIC: BionicConfig;
   readonly COLUMN_THRESHOLD: number;
-  readonly DOM_ATTRS: DOMAttributes;
   readonly DOM_SELECTORS: DOMSelectors;
   readonly ELEMENTS_PER_FRAME: number;
   readonly INTERSECTION_MARGIN: string;
   readonly INTERSECTION_THRESHOLD: number;
   readonly MUTATION: MutationConfig;
   readonly VIEWPORT_MARGIN: number;
-}
-
-export interface DOMAttributes {
-  readonly OBSERVED_ATTR: string;
-  readonly PROCESSED_ATTR: string;
 }
 
 export interface BionicRatios {

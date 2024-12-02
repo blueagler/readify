@@ -1,12 +1,14 @@
 import type { CustomizedConfig } from "./types";
 
 import { DOMProcessor } from "./core/DOMProcessor";
+import { initReadifyStyles } from "./styles";
 
 export class Readify {
   private static instance: null | Readify = null;
   private processor: DOMProcessor;
 
   constructor(config?: Partial<CustomizedConfig>) {
+    initReadifyStyles();
     this.processor = new DOMProcessor(config);
   }
 

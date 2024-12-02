@@ -1,3 +1,4 @@
+import { DOM_ATTRIBUTES, STYLE_CLASSES } from "../constants/config";
 import { ProcessorConfig } from "../types";
 import { isSpecialCharacter, splitIntoWords } from "../utils/text/textUtils";
 import { findEnglishRanges } from "../utils/text/textUtils";
@@ -19,7 +20,7 @@ export function createBionicNode(
 
   const fragment = document.createDocumentFragment();
   const containerSpan = document.createElement("span");
-  containerSpan.setAttribute(config.DOM_ATTRS.PROCESSED_ATTR, "");
+  containerSpan.setAttribute(DOM_ATTRIBUTES.PROCESSED_ATTRIBUTE, "");
 
   const englishRanges = findEnglishRanges(text).filter(({ $end, $start }) => {
     const word = text.slice($start, $end).trim();
@@ -57,10 +58,14 @@ export function createBionicNode(
         wordSpan.textContent = word;
       } else {
         const strong = document.createElement("strong");
+        strong.className = STYLE_CLASSES.BIONIC_SALIENCED;
         strong.textContent = word.slice(0, boldLength);
         wordSpan.appendChild(strong);
         if (boldLength < word.length) {
-          wordSpan.appendChild(document.createTextNode(word.slice(boldLength)));
+          const remaining = document.createElement("span");
+          remaining.className = STYLE_CLASSES.BIONIC_IGNORED;
+          remaining.textContent = word.slice(boldLength);
+          wordSpan.appendChild(remaining);
         }
       }
 

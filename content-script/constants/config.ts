@@ -1,7 +1,6 @@
 import type {
   BionicConfig,
   BionicRatios,
-  DOMAttributes,
   MutationConfig,
   ProcessorConfig,
   SyllablePatterns,
@@ -14,10 +13,15 @@ export const pixelRatio = window.devicePixelRatio || 1;
 export const screenWidth = window.innerWidth;
 export const screenHeight = window.innerHeight;
 
-const DOM_ATTRS: DOMAttributes = {
-  OBSERVED_ATTR: "data-readify-observed",
-  PROCESSED_ATTR: "data-readify-processed",
-} as const;
+export const STYLE_CLASSES = {
+  BIONIC_IGNORED: "readify-bionic-ignored",
+  BIONIC_SALIENCED: "readify-bionic-salienced",
+};
+
+export const DOM_ATTRIBUTES = {
+  OBSERVED_ATTRIBUTE: "data-readify-observed",
+  PROCESSED_ATTRIBUTE: "data-readify-processed",
+};
 
 const MUTATION: MutationConfig = {
   DEBOUNCE_DELAY: 100,
@@ -550,7 +554,6 @@ const BIONIC: BionicConfig = {
 export const PROCESSOR_CONFIG: ProcessorConfig = {
   BIONIC,
   COLUMN_THRESHOLD: Math.max(50, Math.min(200, Math.floor(screenWidth * 0.1))),
-  DOM_ATTRS,
   DOM_SELECTORS,
   ELEMENTS_PER_FRAME: isMobile ? 10 : 20,
   INTERSECTION_MARGIN: `${Math.floor(screenHeight * 0.2)}px`,
