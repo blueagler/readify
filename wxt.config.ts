@@ -5,6 +5,6 @@ export default defineConfig({
   srcDir: "wxt-src",
   manifest:{
     name: "Readify - Bionic Reading Assistant",
-    description: "Readify transforms your web reading experience by implementing bionic reading patterns, making online content more engaging and easier to comprehend.",
+    description: "Readify works by implementing a bionic reading mode on web text, making it more engaging and easier to understand.",
   }
 });
