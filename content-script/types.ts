@@ -21,7 +21,6 @@ export interface BionicConfig {
 }
 
 export interface MutationConfig {
-  readonly ATTRIBUTES_FILTER: Set<string>;
   readonly DEBOUNCE_DELAY: number;
   readonly OPTIONS: MutationObserverInit;
 }
@@ -53,7 +52,7 @@ export interface BionicRatios {
   readonly SINGLE_SYLLABLE: {
     readonly LONG: number;
     readonly MEDIUM: number;
-    readonly SHORT: number;
+    readonly $SHORT: number;
   };
 }
 

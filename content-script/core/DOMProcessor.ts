@@ -22,6 +22,8 @@ export class DOMProcessor {
   private mutationObserver!: MutationObserver;
   private taskBuffer: Element[] = [];
   private taskQueue: (() => void)[] = [];
+  // Add a Set to track elements being processed
+  private processingSet = new Set<Element>();
 
   constructor(config?: Partial<CustomizedConfig>) {
     this.$config.BIONIC.boldFactor =
@@ -140,34 +142,60 @@ export class DOMProcessor {
 
   private processNewContent(root: Element): void {
     queueMicrotask(() => {
-      if (isInsideIgnoredTag(root, this.$config.ignoreTags)) {
+      if (
+        isInsideIgnoredTag(root, this.$config.ignoreTags) || 
+        this.processingSet.has(root)
+      ) {
         return;
       }
+
+      const elements = new Set<Element>();
+      const elementsToObserve = new Set<Element>(); // Add this to track invisible elements
 
       const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
         acceptNode: (node): number => {
           if (!(node instanceof HTMLElement)) return NodeFilter.FILTER_SKIP;
-
-          if (this.$config.ignoreTags.has(node.tagName)) {
+          
+          if (
+            this.$config.ignoreTags.has(node.tagName) || 
+            this.processingSet.has(node)
+          ) {
             return NodeFilter.FILTER_REJECT;
           }
 
-          return this.getTextNodes(node).length > 0 && this.shouldProcess(node)
-            ? NodeFilter.FILTER_ACCEPT
-            : NodeFilter.FILTER_SKIP;
+          // Only process leaf nodes or nodes with direct text children
+          if (this.shouldProcess(node)) {
+            const hasDirectTextNode = Array.from(node.childNodes).some(
+              child => child.nodeType === Node.TEXT_NODE && child.textContent?.trim()
+            );
+            if (hasDirectTextNode) {
+              // If visible, process; if not, observe
+              if (isElementVisible(node)) {
+                elements.add(node);
+              } else {
+                elementsToObserve.add(node);
+              }
+              return NodeFilter.FILTER_REJECT; // Skip children
+            }
+          }
+          
+          return NodeFilter.FILTER_ACCEPT;
         },
       });
 
-      const elements: Element[] = [];
-      let node: Element | null;
-      while ((node = walker.nextNode() as Element)) {
-        elements.push(node);
-      }
+      while (walker.nextNode()) {} // Just traverse to apply filter
 
-      if (elements.length > 0) {
-        // Filter out elements that are children of other pending elements
-        const uniqueElements = this.filterRedundantElements(elements);
-        this.taskBuffer.push(...uniqueElements);
+      // Setup observation for invisible elements
+      elementsToObserve.forEach(element => {
+        if (element instanceof HTMLElement && 
+            !element.hasAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR)) {
+          element.setAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR, "");
+          this.intersectionObserver.observe(element);
+        }
+      });
+
+      if (elements.size > 0) {
+        this.taskBuffer.push(...elements);
         this.flushTaskBuffer();
       }
     });
@@ -192,39 +220,30 @@ export class DOMProcessor {
 
   private processTextNodes(element: Element): void {
     if (!this.shouldProcess(element)) return;
+    
+    if (this.processingSet.has(element)) return;
+    this.processingSet.add(element);
 
-    const walker = document.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, {
-      acceptNode: (node): number => {
-        if (!(node instanceof HTMLElement)) return NodeFilter.FILTER_SKIP;
-        return !this.isProcessed(node) &&
-          !isBionicSpan(node) &&
-          !node.querySelector("strong")
-          ? NodeFilter.FILTER_ACCEPT
-          : NodeFilter.FILTER_SKIP;
-      },
-    });
+    try {
+      // Only process direct text nodes, don't recurse
+      const textNodes = Array.from(element.childNodes).filter(
+        node => node.nodeType === Node.TEXT_NODE && node.textContent?.trim()
+      );
 
-    let node: Element | null;
-    while ((node = walker.nextNode() as Element)) {
-      this.processTextNodes(node);
-    }
+      if (textNodes.length) {
+        textNodes.forEach(node => {
+          if (node.textContent) {
+            const processedNode = createBionicNode(node.textContent, this.$config);
+            node.parentNode?.replaceChild(processedNode, node);
+          }
+        });
 
-    const textNodes = Array.from(element.childNodes).filter(
-      (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
-    );
-
-    if (!textNodes.length) return;
-
-    // Process each text node in place
-    textNodes.forEach((node) => {
-      if (node.textContent) {
-        const processedNode = createBionicNode(node.textContent, this.$config);
-        node.parentNode?.replaceChild(processedNode, node);
+        if (element instanceof HTMLElement) {
+          element.setAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR, "");
+        }
       }
-    });
-
-    if (element instanceof HTMLElement) {
-      element.setAttribute(this.$config.DOM_ATTRS.PROCESSED_ATTR, "");
+    } finally {
+      this.processingSet.delete(element);
     }
   }
 
@@ -250,7 +269,17 @@ export class DOMProcessor {
         );
 
         while (index < endIndex) {
-          this.processTextNodes(elements[index]);
+          const element = elements[index];
+          // Recheck visibility before processing
+          if (isElementVisible(element)) {
+            this.processTextNodes(element);
+          } else {
+            // If not visible, observe it
+            if (element instanceof HTMLElement) {
+              element.setAttribute(this.$config.DOM_ATTRS.OBSERVED_ATTR, "");
+              this.intersectionObserver.observe(element);
+            }
+          }
           index++;
           if (performance.now() - startTime > 16) {
             break;
@@ -279,7 +308,8 @@ export class DOMProcessor {
           if (
             entry.isIntersecting &&
             entry.target instanceof Element &&
-            !isInsideIgnoredTag(entry.target, this.$config.ignoreTags)
+            !isInsideIgnoredTag(entry.target, this.$config.ignoreTags) &&
+            !this.isProcessed(entry.target) // Add this check
           ) {
             this.queueTask(() => this.processTextNodes(entry.target));
             this.intersectionObserver.unobserve(entry.target);
@@ -388,10 +418,7 @@ export class DOMProcessor {
   public $start(): void {
     this.processNewContent(document.body);
 
-    this.mutationObserver.observe(document.body, {
-      ...this.$config.MUTATION.OPTIONS,
-      attributeFilter: [...this.$config.MUTATION.ATTRIBUTES_FILTER],
-    });
+    this.mutationObserver.observe(document.body,this.$config.MUTATION.OPTIONS);
   }
 
   public stop(): void {

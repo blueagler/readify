@@ -18,14 +18,6 @@ const DOM_ATTRS: DOMAttributes = {
 } as const;
 
 const MUTATION: MutationConfig = {
-  ATTRIBUTES_FILTER: new Set([
-    "class",
-    "style",
-    "contenteditable",
-    "role",
-    DOM_ATTRS.PROCESSED_ATTR,
-    DOM_ATTRS.OBSERVED_ATTR,
-  ]),
   DEBOUNCE_DELAY: 100,
   OPTIONS: {
     attributeOldValue: false,
@@ -47,7 +39,7 @@ const BIONIC_RATIOS: BionicRatios = {
   SINGLE_SYLLABLE: {
     LONG: 0.45,
     MEDIUM: 0.4,
-    SHORT: 0.35,
+    $SHORT: 0.35,
   },
 } as const;
 
