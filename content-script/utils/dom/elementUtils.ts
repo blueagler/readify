@@ -3,21 +3,20 @@ import { ElementPosition } from "../../types";
 
 export function isElementVisible(element: Element): boolean {
   if (!(element instanceof HTMLElement)) return false;
-  
+
   // Check if element is actually rendered
   const style = window.getComputedStyle(element);
-  if (style.display === 'none' || style.visibility === 'hidden') {
+  if (style.display === "none" || style.visibility === "hidden") {
     return false;
   }
 
   const rect = element.getBoundingClientRect();
-  const viewportHeight = window.innerHeight;
-  
+
   // Check if element is within viewport with margin
   return (
-    rect.top <= viewportHeight + PROCESSOR_CONFIG.VIEWPORT_MARGIN &&
+    rect.top <= screenHeight + PROCESSOR_CONFIG.VIEWPORT_MARGIN &&
     rect.bottom >= -PROCESSOR_CONFIG.VIEWPORT_MARGIN &&
-    rect.height > 0 && 
+    rect.height > 0 &&
     rect.width > 0
   );
 }
@@ -55,18 +54,4 @@ export function getElementPosition(element: Element): ElementPosition {
     $x: rect.left,
     $y: rect.top,
   };
-}
-
-export function isInsideIgnoredTag(
-  element: Element,
-  ignoreTags: Set<string>,
-): boolean {
-  let current = element;
-  while (current) {
-    if (ignoreTags.has(current.tagName)) {
-      return true;
-    }
-    current = current.parentElement as Element;
-  }
-  return false;
 }

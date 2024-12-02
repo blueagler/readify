@@ -29,8 +29,8 @@ export interface ProcessorConfig {
   readonly BIONIC: BionicConfig;
   readonly COLUMN_THRESHOLD: number;
   readonly DOM_ATTRS: DOMAttributes;
+  readonly DOM_SELECTORS: DOMSelectors;
   readonly ELEMENTS_PER_FRAME: number;
-  readonly ignoreTags: Set<string>;
   readonly INTERSECTION_MARGIN: string;
   readonly INTERSECTION_THRESHOLD: number;
   readonly MUTATION: MutationConfig;
@@ -50,9 +50,9 @@ export interface BionicRatios {
     readonly TWO: number;
   };
   readonly SINGLE_SYLLABLE: {
+    readonly $SHORT: number;
     readonly LONG: number;
     readonly MEDIUM: number;
-    readonly $SHORT: number;
   };
 }
 
@@ -88,4 +88,21 @@ export interface CustomizedConfig {
 export interface WordAnalysis {
   boldLength: number;
   syllables: number;
+}
+
+interface ElementCheckConfig {
+  readonly ATTRIBUTES?: readonly string[];
+  readonly CLOSEST?: readonly string[];
+  readonly ROLES?: readonly string[];
+  readonly TAGS?: readonly string[];
+}
+
+export enum ElementCheckType {
+  Editable = 1,
+  HighPerformance = 2,
+  Ignored = 0,
+}
+
+interface DOMSelectors {
+  readonly ELEMENT_CHECKS: Record<ElementCheckType, ElementCheckConfig>;
 }
