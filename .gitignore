@@ -2,5 +2,5 @@
 /node_modules
 /bun.lockb
 /.wxt
-/extension-build
 /content-build
+/extension-build
