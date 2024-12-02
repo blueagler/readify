@@ -91,18 +91,22 @@ export interface WordAnalysis {
 }
 
 interface ElementCheckConfig {
+  readonly ATTRIBUTE_VALUES?: readonly Readonly<[string, string]>[];
   readonly ATTRIBUTES?: readonly string[];
+  readonly CLASS_NAMES?: readonly string[];
   readonly CLOSEST?: readonly string[];
   readonly ROLES?: readonly string[];
+  readonly STYLES?: readonly Readonly<[string, string]>[];
   readonly TAGS?: readonly string[];
 }
 
 export enum ElementCheckType {
-  Editable = 1,
+  Editable = 3,
+  Hidden = 1,
   HighPerformance = 2,
   Ignored = 0,
 }
 
 interface DOMSelectors {
-  readonly ELEMENT_CHECKS: Record<ElementCheckType, ElementCheckConfig>;
+  ELEMENT_CHECKS: Record<ElementCheckType, ElementCheckConfig>;
 }

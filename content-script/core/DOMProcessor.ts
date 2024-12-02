@@ -44,15 +44,37 @@ export class DOMProcessor {
     if (config.ATTRIBUTES?.some((attr) => element.hasAttribute(attr)))
       return true;
     if (
+      config.ATTRIBUTE_VALUES?.some(
+        ([attr, value]) => element.getAttribute(attr) === value,
+      )
+    )
+      return true;
+    if (
+      config.CLASS_NAMES?.some(
+        (className) =>
+          typeof element.className === "string" &&
+          element.className.includes(className),
+      )
+    )
+      return true;
+    if (
+      config.STYLES?.some(
+        ([prop, value]) =>
+          window.getComputedStyle(element)[prop as any] === value,
+      )
+    )
+      return true;
+    if (
       config.ROLES &&
       element.hasAttribute("role") &&
       config.ROLES.includes(element.getAttribute("role")?.toLowerCase() || "")
     ) {
       return true;
     }
-    return config.CLOSEST?.some(
-      (selector) => element.closest(selector) !== null,
-    ) ?? false;
+    return (
+      config.CLOSEST?.some((selector) => element.closest(selector) !== null) ??
+      false
+    );
   }
   private cleanupRemovedElement(root: Element): void {
     if (root instanceof HTMLElement) {
@@ -101,20 +123,6 @@ export class DOMProcessor {
       }
     });
   }
-  private getTextNodes(element: Element): Node[] {
-    const nodes: Node[] = [];
-    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, {
-      acceptNode: (node) =>
-        node.textContent?.trim()
-          ? NodeFilter.FILTER_ACCEPT
-          : NodeFilter.FILTER_REJECT,
-    });
-    let node;
-    while ((node = walker.nextNode())) {
-      nodes.push(node);
-    }
-    return nodes;
-  }
   private isChildOfPendingElements(
     element: Element,
     elements: Element[],
@@ -125,6 +133,9 @@ export class DOMProcessor {
   }
   private isEditableOrInteractive(element: Element): boolean {
     return this.checkElementType(element, ElementCheckType.Editable);
+  }
+  private isHidden(element: Element): boolean {
+    return this.checkElementType(element, ElementCheckType.Hidden);
   }
   private isHighPerformanceElement(element: Element): boolean {
     return this.checkElementType(element, ElementCheckType.HighPerformance);
@@ -340,32 +351,7 @@ export class DOMProcessor {
     if (this.isEditableOrInteractive(element)) return false;
     if (this.isHighPerformanceElement(element)) return false;
     if (this.isIgnored(element)) return false;
-    if (
-      element.hasAttribute("aria-hidden") ||
-      element.hasAttribute("aria-label") ||
-      element.hasAttribute("data-noprocess") ||
-      element.hasAttribute("data-raw") ||
-      element.getAttribute("translate") === "no"
-    )
-      return false;
-    const className = element.className;
-    if (
-      typeof className === "string" &&
-      (className.includes("no-process") ||
-        className.includes("code") ||
-        className.includes("math") ||
-        className.includes("syntax"))
-    )
-      return false;
-    const style = window.getComputedStyle(element);
-    if (
-      style.display === "none" ||
-      style.visibility === "hidden" ||
-      style.opacity === "0" ||
-      style.clipPath === "inset(100%)" ||
-      style.clip === "rect(0, 0, 0, 0)"
-    )
-      return false;
+    if (this.isHidden(element)) return false;
     if (isBionicSpan(element)) return false;
     const text = element.textContent || "";
     if (!text.trim() || !/[a-zA-Z]/.test(text)) return false;

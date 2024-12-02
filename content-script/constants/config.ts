@@ -403,13 +403,23 @@ const BIONIC_COMMON_WORDS = new Set<string>([
 const DOM_SELECTORS = {
   ELEMENT_CHECKS: {
     [ElementCheckType.Editable]: {
-      ATTRIBUTES: ["contenteditable"],
-      CLOSEST: [
-        '[contenteditable="true"]',
-        'input, textarea, select, [role="textbox"]',
-        ".monaco-editor, .CodeMirror, .ace_editor",
-        ".ql-editor, .tox-tinymce, .cke_editable",
-        "[ng-model], [v-model], [data-reactroot]",
+      ATTRIBUTE_VALUES: [
+        ["contenteditable", "true"],
+        ["contenteditable", "plaintext-only"],
+      ],
+      ATTRIBUTES: ["contenteditable", "ng-model", "v-model", "data-reactroot"],
+      CLASS_NAMES: [
+        "editable",
+        "editor",
+        "wysiwyg",
+        "rich-text",
+        "quill",
+        "monaco-editor",
+        "CodeMirror",
+        "ace_editor",
+        "ql-editor",
+        "tox-tinymce",
+        "cke_editable",
       ],
       ROLES: [
         "combobox",
@@ -420,16 +430,46 @@ const DOM_SELECTORS = {
         "spinbutton",
         "textbox",
       ],
+      STYLES: [
+        ["cursor", "text"],
+        ["cursor", "text !important"],
+      ],
       TAGS: ["INPUT", "TEXTAREA", "SELECT", "BUTTON", "OPTION"],
     },
-    [ElementCheckType.HighPerformance]: {
-      CLOSEST: [
-        "video, .video-js, .plyr, [data-player]",
-        "canvas, .three-js, webgl",
-        ".gsap-marker-root, .lottie",
-        "[data-unity], [data-phaser]",
-        ".highcharts-container, .echarts, [data-visualization]",
+    [ElementCheckType.Hidden]: {
+      ATTRIBUTES: ["aria-hidden"],
+      CLASS_NAMES: ["code", "math", "syntax"],
+      STYLES: [
+        ["display", "none"],
+        ["visibility", "hidden"],
+        ["opacity", "0"],
+        ["clipPath", "inset(100%)"],
+        ["clip", "rect(0, 0, 0, 0)"],
       ],
+    },
+    [ElementCheckType.HighPerformance]: {
+      ATTRIBUTES: [
+        "data-player",
+        "data-unity",
+        "data-phaser",
+        "data-visualization",
+      ],
+      CLASS_NAMES: [
+        "video",
+        "video-js",
+        "plyr",
+        "three-js",
+        "webgl",
+        "gsap-marker-root",
+        "lottie",
+        "unity",
+        "phaser",
+        "highcharts-container",
+        "echarts",
+        "visualization",
+      ],
+      ROLES: ["presentation"],
+      TAGS: ["CANVAS", "OBJECT", "EMBED"],
     },
     [ElementCheckType.Ignored]: {
       TAGS: [
@@ -461,11 +501,9 @@ const DOM_SELECTORS = {
         "TEMPLATE",
         "SLOT",
         "PORTAL",
-        "DIALOG",
         "DATALIST",
         "OPTGROUP",
         "MARQUEE",
-        "CONTENTEDITABLE",
         "EDITOR",
         "WYSIWYG",
         "DETAILS",
@@ -491,8 +529,6 @@ const DOM_SELECTORS = {
         "MN",
         "ROUTER-VIEW",
         "ROUTER-LINK",
-        "APP-ROOT",
-        "NG-COMPONENT",
       ],
     },
   },
