@@ -1,5 +1,6 @@
 {
-  "name": "@blueagle/readify",
+  "name": "readify",
+  "description": "Readify is a browser extension that enhances reading experience by applying bionic reading patterns to web content.",
   "version": "0.0.2",
   "devDependencies": {
     "@types/bun": "1.1.13",
