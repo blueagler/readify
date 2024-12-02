@@ -4,16 +4,15 @@
     "module": "ESNext",
     "strict": true,
     "moduleResolution": "Bundler",
-    "target": "ESNext",
-    "paths": {
-      "@/*": ["./content-script/*"]
-    }
+    "target": "ESNext"
   },
   "exclude": ["node_modules", "dist"],
   "include": [
-    "content-script/*.ts",
-    "content-script/**/*.ts",
-    "entrypoints/*.ts",
-    "eslint.config.mjs"
+    "wxt-src/*.ts",
+    "wxt-src/**/*.ts",
+    "content-src/*ts",
+    "content-src/**/*.ts",
+    "eslint.config.mjs",
+    "wxt.config.ts"
   ]
 }

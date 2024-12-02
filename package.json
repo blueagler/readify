@@ -23,7 +23,7 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "postinstall": "wxt prepare",
-    "build:content": "bun gcc-ts-bundler --src_dir='./content-script' --entry_point='./index.ts' --js_output_file='./dist/index.js' --language_out=ES6 && cp ./dist/index.js ./dist/_index.js",
+    "build:content": "bun gcc-ts-bundler --src_dir='./content-src' --entry_point='./index.ts' --output_dir='./content-build' --language_out=ES6 && cp ./content-build/index.js ./content-build/_index.js",
     "lint": "bun --bun prettier . --write && bun --bun eslint . --fix"
   },
   "sideEffects": [],
