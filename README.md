@@ -37,3 +37,6 @@
 
 ## Privacy
 Please read our [Privacy Policy](privacy.md) to understand how Readify handles your data.
+
+## Changelog
+See [CHANGELOG.md](CHANGELOG.md) for a list of changes and version history.
