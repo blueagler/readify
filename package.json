@@ -6,6 +6,7 @@
     "@types/bun": "1.1.13",
     "@types/chrome": "0.0.280",
     "@types/node": "22.9.0",
+    "@wxt-dev/auto-icons": "^1.0.2",
     "eslint": "^9.16.0",
     "eslint-plugin-perfectionist": "^3.9.1",
     "gcc-ts-bundler": "0.1.0",
