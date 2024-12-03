@@ -24,7 +24,7 @@ const MUTATION: MutationConfig = {
     attributeOldValue: false,
     attributes: false,
     characterData: true,
-    characterDataOldValue: false,
+    characterDataOldValue: true,
     childList: true,
     subtree: true,
   },

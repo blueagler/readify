@@ -1,13 +1,14 @@
 import type { CustomizedConfig } from "./types";
-
 import { DOMProcessor } from "./core/DOMProcessor";
 import { initReadifyStyles } from "./styles";
+import { patchDOMMethods, restoreDOMMethods } from "./utils/dom/safeDOM";
 
 export class Readify {
   private static instance: null | Readify = null;
   private processor: DOMProcessor;
 
   constructor(config?: Partial<CustomizedConfig>) {
+    patchDOMMethods();
     initReadifyStyles();
     this.processor = new DOMProcessor(config);
   }
@@ -35,5 +36,6 @@ export class Readify {
 
   public $stop(): void {
     this.processor.$stop();
+    restoreDOMMethods();
   }
 }

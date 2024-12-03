@@ -142,9 +142,16 @@ export class DOMProcessor {
     element: Element,
     elements: Element[],
   ): boolean {
-    return elements.some(
-      (pending) => pending.contains(element) && pending !== element,
-    );
+    if (!element || !(element instanceof Element)) return false;
+
+    return elements.some((pending) => {
+      if (!pending || !(pending instanceof Element)) return false;
+      return (
+        typeof pending.contains === "function" &&
+        pending.contains(element) &&
+        pending !== element
+      );
+    });
   }
   private isContentProcessed(node: Node): boolean {
     if (node instanceof Element) {
@@ -184,7 +191,12 @@ export class DOMProcessor {
     );
   }
   private processNewContent(root: Element | ShadowRoot): void {
-    if (!root || (root instanceof Element && (this.isIgnored(root) || this.isProcessed(root)))) return;
+    if (
+      !root ||
+      (root instanceof Element &&
+        (this.isIgnored(root) || this.isProcessed(root)))
+    )
+      return;
 
     queueMicrotask(() => {
       const elements = new Set<Element>();
@@ -194,7 +206,10 @@ export class DOMProcessor {
       const processShadowRoot = (element: Element) => {
         const shadowRoot = element.shadowRoot;
         if (shadowRoot) {
-          this.mutationObserver.observe(shadowRoot, this.$config.MUTATION.OPTIONS);
+          this.mutationObserver.observe(
+            shadowRoot,
+            this.$config.MUTATION.OPTIONS,
+          );
           this.processNewContent(shadowRoot);
         }
       };
@@ -483,13 +498,16 @@ export class DOMProcessor {
       while ((node = walker.nextNode() as Element)) {
         if (node.shadowRoot) {
           shadowRoots.add(node.shadowRoot);
-          this.mutationObserver.observe(node.shadowRoot, this.$config.MUTATION.OPTIONS);
+          this.mutationObserver.observe(
+            node.shadowRoot,
+            this.$config.MUTATION.OPTIONS,
+          );
         }
       }
     };
 
     findShadowRoots(document.body);
-    shadowRoots.forEach(root => this.processNewContent(root));
+    shadowRoots.forEach((root) => this.processNewContent(root));
   }
   public $stop(): void {
     this.intersectionObserver.disconnect();

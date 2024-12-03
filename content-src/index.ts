@@ -9,6 +9,6 @@ export const start = () => {
   });
 };
 
-export const stop = () => {
-  instance?.$stop();
-};
+// export const stop = () => {
+//   instance?.$stop();
+// };
