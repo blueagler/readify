@@ -41,10 +41,12 @@
 ### Build Safari Extension from Source
 
 1. Clone the repository
-2. Open `./apple-platform/Readify/Readify.xcodeproj` in Xcode
-3. Select your development team in the project settings
-4. Build and run the project
-5. Enable the extension in Safari > Preferences > Extensions
+2. Run `bun install` to install dependencies
+3. Run `bun run build` to build the extension
+4. Open `./apple-platform/Readify/Readify.xcodeproj` in Xcode
+5. Select your development team in the project settings
+6. Build and run the project
+7. Enable the extension in Safari > Preferences > Extensions
 
 ### Manual Installation for Chromium-based Browsers
 
