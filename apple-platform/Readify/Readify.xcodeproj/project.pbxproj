@@ -1,0 +1,956 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		DC40D54A2CFED9D2003A88CF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC40D5492CFED9D2003A88CF /* AppDelegate.swift */; };
+		DC40D54C2CFED9D2003A88CF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC40D54B2CFED9D2003A88CF /* SceneDelegate.swift */; };
+		DC40D54F2CFED9D2003A88CF /* Base in Resources */ = {isa = PBXBuildFile; fileRef = DC40D54E2CFED9D2003A88CF /* Base */; };
+		DC40D5522CFED9D2003A88CF /* Base in Resources */ = {isa = PBXBuildFile; fileRef = DC40D5512CFED9D2003A88CF /* Base */; };
+		DC40D55B2CFED9D2003A88CF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC40D55A2CFED9D2003A88CF /* AppDelegate.swift */; };
+		DC40D55E2CFED9D2003A88CF /* Base in Resources */ = {isa = PBXBuildFile; fileRef = DC40D55D2CFED9D2003A88CF /* Base */; };
+		DC40D5662CFED9D2003A88CF /* Readify Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DC40D5652CFED9D2003A88CF /* Readify Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DC40D5702CFED9D2003A88CF /* Readify Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DC40D56F2CFED9D2003A88CF /* Readify Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DC40D5762CFED9D2003A88CF /* Base in Resources */ = {isa = PBXBuildFile; fileRef = DC40D53A2CFED9D0003A88CF /* Base */; };
+		DC40D5772CFED9D2003A88CF /* Base in Resources */ = {isa = PBXBuildFile; fileRef = DC40D53A2CFED9D0003A88CF /* Base */; };
+		DC40D5782CFED9D2003A88CF /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = DC40D53B2CFED9D0003A88CF /* Icon.png */; };
+		DC40D5792CFED9D2003A88CF /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = DC40D53B2CFED9D0003A88CF /* Icon.png */; };
+		DC40D57A2CFED9D2003A88CF /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = DC40D53C2CFED9D0003A88CF /* Style.css */; };
+		DC40D57B2CFED9D2003A88CF /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = DC40D53C2CFED9D0003A88CF /* Style.css */; };
+		DC40D57C2CFED9D2003A88CF /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = DC40D53D2CFED9D0003A88CF /* Script.js */; };
+		DC40D57D2CFED9D2003A88CF /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = DC40D53D2CFED9D0003A88CF /* Script.js */; };
+		DC40D57E2CFED9D2003A88CF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC40D53E2CFED9D0003A88CF /* ViewController.swift */; };
+		DC40D57F2CFED9D2003A88CF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC40D53E2CFED9D0003A88CF /* ViewController.swift */; };
+		DC40D5802CFED9D2003A88CF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC40D53F2CFED9D1003A88CF /* Assets.xcassets */; };
+		DC40D5812CFED9D2003A88CF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC40D53F2CFED9D1003A88CF /* Assets.xcassets */; };
+		DC40D5822CFED9D2003A88CF /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC40D5412CFED9D1003A88CF /* SafariWebExtensionHandler.swift */; };
+		DC40D5832CFED9D2003A88CF /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC40D5412CFED9D1003A88CF /* SafariWebExtensionHandler.swift */; };
+		DC40D5982CFED9D2003A88CF /* content-scripts in Resources */ = {isa = PBXBuildFile; fileRef = DC40D5952CFED9D2003A88CF /* content-scripts */; };
+		DC40D5992CFED9D2003A88CF /* icons in Resources */ = {isa = PBXBuildFile; fileRef = DC40D5962CFED9D2003A88CF /* icons */; };
+		DC40D59A2CFED9D2003A88CF /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = DC40D5972CFED9D2003A88CF /* manifest.json */; };
+		DC40D59B2CFED9D2003A88CF /* content-scripts in Resources */ = {isa = PBXBuildFile; fileRef = DC40D5952CFED9D2003A88CF /* content-scripts */; };
+		DC40D59C2CFED9D2003A88CF /* icons in Resources */ = {isa = PBXBuildFile; fileRef = DC40D5962CFED9D2003A88CF /* icons */; };
+		DC40D59D2CFED9D2003A88CF /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = DC40D5972CFED9D2003A88CF /* manifest.json */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		DC40D5672CFED9D2003A88CF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DC40D5332CFED9D0003A88CF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DC40D5642CFED9D2003A88CF;
+			remoteInfo = "Readify Extension (iOS)";
+		};
+		DC40D5712CFED9D2003A88CF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DC40D5332CFED9D0003A88CF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DC40D56E2CFED9D2003A88CF;
+			remoteInfo = "Readify Extension (macOS)";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		DC40D5892CFED9D2003A88CF /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				DC40D5662CFED9D2003A88CF /* Readify Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC40D5902CFED9D2003A88CF /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				DC40D5702CFED9D2003A88CF /* Readify Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		DC40D53A2CFED9D0003A88CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = ../Base.lproj/Main.html; sourceTree = "<group>"; };
+		DC40D53B2CFED9D0003A88CF /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		DC40D53C2CFED9D0003A88CF /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		DC40D53D2CFED9D0003A88CF /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		DC40D53E2CFED9D0003A88CF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		DC40D53F2CFED9D1003A88CF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		DC40D5412CFED9D1003A88CF /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		DC40D5462CFED9D2003A88CF /* Readify.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Readify.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DC40D5492CFED9D2003A88CF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		DC40D54B2CFED9D2003A88CF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		DC40D54E2CFED9D2003A88CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		DC40D5512CFED9D2003A88CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		DC40D5532CFED9D2003A88CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DC40D5582CFED9D2003A88CF /* Readify.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Readify.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DC40D55A2CFED9D2003A88CF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		DC40D55D2CFED9D2003A88CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		DC40D55F2CFED9D2003A88CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DC40D5602CFED9D2003A88CF /* Readify.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Readify.entitlements; sourceTree = "<group>"; };
+		DC40D5652CFED9D2003A88CF /* Readify Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Readify Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DC40D56A2CFED9D2003A88CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DC40D56F2CFED9D2003A88CF /* Readify Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Readify Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DC40D5742CFED9D2003A88CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DC40D5752CFED9D2003A88CF /* Readify.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Readify.entitlements; sourceTree = "<group>"; };
+		DC40D5952CFED9D2003A88CF /* content-scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "content-scripts"; path = "Resources/content-scripts"; sourceTree = "<group>"; };
+		DC40D5962CFED9D2003A88CF /* icons */ = {isa = PBXFileReference; lastKnownFileType = folder; name = icons; path = Resources/icons; sourceTree = "<group>"; };
+		DC40D5972CFED9D2003A88CF /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = Resources/manifest.json; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DC40D5432CFED9D1003A88CF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC40D5552CFED9D2003A88CF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC40D5622CFED9D2003A88CF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC40D56C2CFED9D2003A88CF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		DC40D5322CFED9D0003A88CF = {
+			isa = PBXGroup;
+			children = (
+				DC40D5372CFED9D0003A88CF /* Shared (App) */,
+				DC40D5402CFED9D1003A88CF /* Shared (Extension) */,
+				DC40D5482CFED9D2003A88CF /* iOS (App) */,
+				DC40D5592CFED9D2003A88CF /* macOS (App) */,
+				DC40D5692CFED9D2003A88CF /* iOS (Extension) */,
+				DC40D5732CFED9D2003A88CF /* macOS (Extension) */,
+				DC40D5472CFED9D2003A88CF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DC40D5372CFED9D0003A88CF /* Shared (App) */ = {
+			isa = PBXGroup;
+			children = (
+				DC40D53E2CFED9D0003A88CF /* ViewController.swift */,
+				DC40D53F2CFED9D1003A88CF /* Assets.xcassets */,
+				DC40D5382CFED9D0003A88CF /* Resources */,
+			);
+			path = "Shared (App)";
+			sourceTree = "<group>";
+		};
+		DC40D5382CFED9D0003A88CF /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				DC40D5392CFED9D0003A88CF /* Main.html */,
+				DC40D53B2CFED9D0003A88CF /* Icon.png */,
+				DC40D53C2CFED9D0003A88CF /* Style.css */,
+				DC40D53D2CFED9D0003A88CF /* Script.js */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		DC40D5402CFED9D1003A88CF /* Shared (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				DC40D5942CFED9D2003A88CF /* Resources */,
+				DC40D5412CFED9D1003A88CF /* SafariWebExtensionHandler.swift */,
+			);
+			path = "Shared (Extension)";
+			sourceTree = "<group>";
+		};
+		DC40D5472CFED9D2003A88CF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DC40D5462CFED9D2003A88CF /* Readify.app */,
+				DC40D5582CFED9D2003A88CF /* Readify.app */,
+				DC40D5652CFED9D2003A88CF /* Readify Extension.appex */,
+				DC40D56F2CFED9D2003A88CF /* Readify Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DC40D5482CFED9D2003A88CF /* iOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				DC40D5492CFED9D2003A88CF /* AppDelegate.swift */,
+				DC40D54B2CFED9D2003A88CF /* SceneDelegate.swift */,
+				DC40D54D2CFED9D2003A88CF /* LaunchScreen.storyboard */,
+				DC40D5502CFED9D2003A88CF /* Main.storyboard */,
+				DC40D5532CFED9D2003A88CF /* Info.plist */,
+			);
+			path = "iOS (App)";
+			sourceTree = "<group>";
+		};
+		DC40D5592CFED9D2003A88CF /* macOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				DC40D55A2CFED9D2003A88CF /* AppDelegate.swift */,
+				DC40D55C2CFED9D2003A88CF /* Main.storyboard */,
+				DC40D55F2CFED9D2003A88CF /* Info.plist */,
+				DC40D5602CFED9D2003A88CF /* Readify.entitlements */,
+			);
+			path = "macOS (App)";
+			sourceTree = "<group>";
+		};
+		DC40D5692CFED9D2003A88CF /* iOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				DC40D56A2CFED9D2003A88CF /* Info.plist */,
+			);
+			path = "iOS (Extension)";
+			sourceTree = "<group>";
+		};
+		DC40D5732CFED9D2003A88CF /* macOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				DC40D5742CFED9D2003A88CF /* Info.plist */,
+				DC40D5752CFED9D2003A88CF /* Readify.entitlements */,
+			);
+			path = "macOS (Extension)";
+			sourceTree = "<group>";
+		};
+		DC40D5942CFED9D2003A88CF /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				DC40D5952CFED9D2003A88CF /* content-scripts */,
+				DC40D5962CFED9D2003A88CF /* icons */,
+				DC40D5972CFED9D2003A88CF /* manifest.json */,
+			);
+			name = Resources;
+			path = "Shared (Extension)";
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DC40D5452CFED9D1003A88CF /* Readify (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DC40D58A2CFED9D2003A88CF /* Build configuration list for PBXNativeTarget "Readify (iOS)" */;
+			buildPhases = (
+				DC40D5422CFED9D1003A88CF /* Sources */,
+				DC40D5432CFED9D1003A88CF /* Frameworks */,
+				DC40D5442CFED9D1003A88CF /* Resources */,
+				DC40D5892CFED9D2003A88CF /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DC40D5682CFED9D2003A88CF /* PBXTargetDependency */,
+			);
+			name = "Readify (iOS)";
+			packageProductDependencies = (
+			);
+			productName = "Readify (iOS)";
+			productReference = DC40D5462CFED9D2003A88CF /* Readify.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DC40D5572CFED9D2003A88CF /* Readify (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DC40D5912CFED9D2003A88CF /* Build configuration list for PBXNativeTarget "Readify (macOS)" */;
+			buildPhases = (
+				DC40D5542CFED9D2003A88CF /* Sources */,
+				DC40D5552CFED9D2003A88CF /* Frameworks */,
+				DC40D5562CFED9D2003A88CF /* Resources */,
+				DC40D5902CFED9D2003A88CF /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DC40D5722CFED9D2003A88CF /* PBXTargetDependency */,
+			);
+			name = "Readify (macOS)";
+			packageProductDependencies = (
+			);
+			productName = "Readify (macOS)";
+			productReference = DC40D5582CFED9D2003A88CF /* Readify.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DC40D5642CFED9D2003A88CF /* Readify Extension (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DC40D5862CFED9D2003A88CF /* Build configuration list for PBXNativeTarget "Readify Extension (iOS)" */;
+			buildPhases = (
+				DC40D5612CFED9D2003A88CF /* Sources */,
+				DC40D5622CFED9D2003A88CF /* Frameworks */,
+				DC40D5632CFED9D2003A88CF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Readify Extension (iOS)";
+			packageProductDependencies = (
+			);
+			productName = "Readify Extension (iOS)";
+			productReference = DC40D5652CFED9D2003A88CF /* Readify Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		DC40D56E2CFED9D2003A88CF /* Readify Extension (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DC40D58D2CFED9D2003A88CF /* Build configuration list for PBXNativeTarget "Readify Extension (macOS)" */;
+			buildPhases = (
+				DC40D56B2CFED9D2003A88CF /* Sources */,
+				DC40D56C2CFED9D2003A88CF /* Frameworks */,
+				DC40D56D2CFED9D2003A88CF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Readify Extension (macOS)";
+			packageProductDependencies = (
+			);
+			productName = "Readify Extension (macOS)";
+			productReference = DC40D56F2CFED9D2003A88CF /* Readify Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DC40D5332CFED9D0003A88CF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					DC40D5452CFED9D1003A88CF = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					DC40D5572CFED9D2003A88CF = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					DC40D5642CFED9D2003A88CF = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					DC40D56E2CFED9D2003A88CF = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = DC40D5362CFED9D0003A88CF /* Build configuration list for PBXProject "Readify" */;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = DC40D5322CFED9D0003A88CF;
+			productRefGroup = DC40D5472CFED9D2003A88CF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DC40D5452CFED9D1003A88CF /* Readify (iOS) */,
+				DC40D5572CFED9D2003A88CF /* Readify (macOS) */,
+				DC40D5642CFED9D2003A88CF /* Readify Extension (iOS) */,
+				DC40D56E2CFED9D2003A88CF /* Readify Extension (macOS) */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DC40D5442CFED9D1003A88CF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC40D5782CFED9D2003A88CF /* Icon.png in Resources */,
+				DC40D54F2CFED9D2003A88CF /* Base in Resources */,
+				DC40D5762CFED9D2003A88CF /* Base in Resources */,
+				DC40D57C2CFED9D2003A88CF /* Script.js in Resources */,
+				DC40D5802CFED9D2003A88CF /* Assets.xcassets in Resources */,
+				DC40D5522CFED9D2003A88CF /* Base in Resources */,
+				DC40D57A2CFED9D2003A88CF /* Style.css in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC40D5562CFED9D2003A88CF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC40D5792CFED9D2003A88CF /* Icon.png in Resources */,
+				DC40D57B2CFED9D2003A88CF /* Style.css in Resources */,
+				DC40D55E2CFED9D2003A88CF /* Base in Resources */,
+				DC40D57D2CFED9D2003A88CF /* Script.js in Resources */,
+				DC40D5812CFED9D2003A88CF /* Assets.xcassets in Resources */,
+				DC40D5772CFED9D2003A88CF /* Base in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC40D5632CFED9D2003A88CF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC40D59B2CFED9D2003A88CF /* content-scripts in Resources */,
+				DC40D59D2CFED9D2003A88CF /* manifest.json in Resources */,
+				DC40D59C2CFED9D2003A88CF /* icons in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC40D56D2CFED9D2003A88CF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC40D5982CFED9D2003A88CF /* content-scripts in Resources */,
+				DC40D59A2CFED9D2003A88CF /* manifest.json in Resources */,
+				DC40D5992CFED9D2003A88CF /* icons in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DC40D5422CFED9D1003A88CF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC40D57E2CFED9D2003A88CF /* ViewController.swift in Sources */,
+				DC40D54A2CFED9D2003A88CF /* AppDelegate.swift in Sources */,
+				DC40D54C2CFED9D2003A88CF /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC40D5542CFED9D2003A88CF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC40D57F2CFED9D2003A88CF /* ViewController.swift in Sources */,
+				DC40D55B2CFED9D2003A88CF /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC40D5612CFED9D2003A88CF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC40D5822CFED9D2003A88CF /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC40D56B2CFED9D2003A88CF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC40D5832CFED9D2003A88CF /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DC40D5682CFED9D2003A88CF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DC40D5642CFED9D2003A88CF /* Readify Extension (iOS) */;
+			targetProxy = DC40D5672CFED9D2003A88CF /* PBXContainerItemProxy */;
+		};
+		DC40D5722CFED9D2003A88CF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DC40D56E2CFED9D2003A88CF /* Readify Extension (macOS) */;
+			targetProxy = DC40D5712CFED9D2003A88CF /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		DC40D5392CFED9D0003A88CF /* Main.html */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DC40D53A2CFED9D0003A88CF /* Base */,
+			);
+			name = Main.html;
+			sourceTree = "<group>";
+		};
+		DC40D54D2CFED9D2003A88CF /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DC40D54E2CFED9D2003A88CF /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		DC40D5502CFED9D2003A88CF /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DC40D5512CFED9D2003A88CF /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		DC40D55C2CFED9D2003A88CF /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DC40D55D2CFED9D2003A88CF /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		DC40D5842CFED9D2003A88CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		DC40D5852CFED9D2003A88CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		DC40D5872CFED9D2003A88CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7YCJPYU4YT;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Readify Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.blueagle.readify.safari-extension";
+				PRODUCT_NAME = "Readify Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DC40D5882CFED9D2003A88CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7YCJPYU4YT;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Readify Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.blueagle.readify.safari-extension";
+				PRODUCT_NAME = "Readify Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		DC40D58B2CFED9D2003A88CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7YCJPYU4YT;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Readify;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.blueagle.readify;
+				PRODUCT_NAME = Readify;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DC40D58C2CFED9D2003A88CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7YCJPYU4YT;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Readify;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.blueagle.readify;
+				PRODUCT_NAME = Readify;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		DC40D58E2CFED9D2003A88CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Readify.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7YCJPYU4YT;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Readify Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.blueagle.readify.safari-extension";
+				PRODUCT_NAME = "Readify Extension";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		DC40D58F2CFED9D2003A88CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Readify.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7YCJPYU4YT;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Readify Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.blueagle.readify.safari-extension";
+				PRODUCT_NAME = "Readify Extension";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		DC40D5922CFED9D2003A88CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Readify.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7YCJPYU4YT;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Readify;
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.blueagle.readify;
+				PRODUCT_NAME = Readify;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		DC40D5932CFED9D2003A88CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Readify.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7YCJPYU4YT;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Readify;
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.blueagle.readify;
+				PRODUCT_NAME = Readify;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		DC40D5362CFED9D0003A88CF /* Build configuration list for PBXProject "Readify" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DC40D5842CFED9D2003A88CF /* Debug */,
+				DC40D5852CFED9D2003A88CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DC40D5862CFED9D2003A88CF /* Build configuration list for PBXNativeTarget "Readify Extension (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DC40D5872CFED9D2003A88CF /* Debug */,
+				DC40D5882CFED9D2003A88CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DC40D58A2CFED9D2003A88CF /* Build configuration list for PBXNativeTarget "Readify (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DC40D58B2CFED9D2003A88CF /* Debug */,
+				DC40D58C2CFED9D2003A88CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DC40D58D2CFED9D2003A88CF /* Build configuration list for PBXNativeTarget "Readify Extension (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DC40D58E2CFED9D2003A88CF /* Debug */,
+				DC40D58F2CFED9D2003A88CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DC40D5912CFED9D2003A88CF /* Build configuration list for PBXNativeTarget "Readify (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DC40D5922CFED9D2003A88CF /* Debug */,
+				DC40D5932CFED9D2003A88CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = DC40D5332CFED9D0003A88CF /* Project object */;
+}

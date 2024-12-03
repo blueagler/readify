@@ -38,7 +38,7 @@ const BIONIC_RATIOS: BionicRatios = {
     TWO: 0.45,
   },
   SINGLE_SYLLABLE: {
-    $SHORT: 0.35,
+    _SHORT: 0.35,
     LONG: 0.45,
     MEDIUM: 0.4,
   },

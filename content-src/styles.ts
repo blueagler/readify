@@ -2,9 +2,9 @@ import { STYLE_CLASSES } from "./constants/config";
 
 export function initReadifyStyles() {
   injectStyles({
-    [STYLE_CLASSES.BIONIC_IGNORED]: {
-      opacity: ".9",
-    },
+    // [STYLE_CLASSES.BIONIC_IGNORED]: {
+    //   textDecoration: "line-through",
+    // },
     [STYLE_CLASSES.BIONIC_SALIENCED]: {
       fontWeight: "bold!important",
     },

@@ -15,6 +15,7 @@
 - Configurable settings for bold intensity and word processing
 
 ## Showcase
+
 <div style="display: flex; gap: 10px; justify-content: space-between;">
     <img src="materials/wikipedia-preview.png" width="32%" alt="Wikipedia Preview">
     <img src="materials/nbc-preview.png" width="32%" alt="NBC Preview">
@@ -24,19 +25,23 @@
 ## Installation
 
 ### Chrome Web Store
+
 <a href="https://chromewebstore.google.com/detail/readify/agpjakbhkbidmhaejemhmlcdgdcopnij">
     <img src="https://fonts.gstatic.com/s/i/productlogos/chrome_store/v7/192px.svg" width="24" height="24" style="vertical-align: middle; margin-right: 8px;" alt="Chrome Web Store">
     Readify - Chrome Web Store
 </a>
 
 ### Manual Installation
+
 1. Download the latest release (.crx file) from the [Releases page](https://github.com/blueagler/readify/releases)
 2. Open Chrome and go to `chrome://extensions/`
 3. Enable "Developer mode" in the top right corner
 4. Drag and drop the downloaded .crx file into the extensions page
 
 ## Privacy
-Please read our [Privacy Policy](privacy.md) to understand how Readify handles your data.
+
+Please read our [Privacy Policy](PRIVACY.md) to understand how Readify handles your data.
 
 ## Changelog
+
 See [CHANGELOG.md](CHANGELOG.md) for a list of changes and version history.

@@ -53,7 +53,7 @@ function getDynamicBoldLength(
 
   if (length <= 4) {
     return Math.ceil(
-      length * config.RATIOS.SINGLE_SYLLABLE.$SHORT * config.boldFactor,
+      length * config.RATIOS.SINGLE_SYLLABLE._SHORT * config.boldFactor,
     );
   }
 

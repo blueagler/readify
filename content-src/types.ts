@@ -44,7 +44,7 @@ export interface BionicRatios {
     readonly TWO: number;
   };
   readonly SINGLE_SYLLABLE: {
-    readonly $SHORT: number;
+    readonly _SHORT: number;
     readonly LONG: number;
     readonly MEDIUM: number;
   };

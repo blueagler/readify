@@ -1,18 +1,18 @@
 {
   "name": "readify",
   "description": "Readify is a browser extension that enhances reading experience by applying bionic reading patterns to web content.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "devDependencies": {
-    "@types/bun": "1.1.13",
-    "@types/chrome": "0.0.280",
-    "@types/node": "22.9.0",
+    "@types/bun": "1.1.14",
+    "@types/chrome": "0.0.287",
+    "@types/node": "22.10.1",
     "@wxt-dev/auto-icons": "^1.0.2",
     "eslint": "^9.16.0",
-    "eslint-plugin-perfectionist": "^3.9.1",
-    "gcc-ts-bundler": "0.1.0",
-    "prettier": "3.3.3",
-    "typescript": "5.8.0-dev.20241106",
-    "typescript-eslint": "8.13.1-alpha.1",
+    "eslint-plugin-perfectionist": "^4.1.2",
+    "gcc-ts-bundler": "0.1.2",
+    "prettier": "3.4.1",
+    "typescript": "5.8.0-dev.20241202",
+    "typescript-eslint": "8.17.1-alpha.0",
     "wxt": "^0.19.17"
   },
   "publishConfig": {
@@ -20,12 +20,11 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "dev": "wxt",
-    "zip": "wxt zip",
-    "zip:firefox": "wxt zip -b firefox",
-    "postinstall": "wxt prepare",
-    "build:content": "bun gcc-ts-bundler --src_dir='./content-src' --entry_point='./index.ts' --output_dir='./content-build' --language_out=ES6 && cp ./content-build/index.js ./content-build/_index.js",
-    "lint": "bun --bun prettier . --write && bun --bun eslint . --fix"
+    "dev": "./scripts/dev.sh",
+    "build": "./scripts/build.sh",
+    "postinstall": "wxt prepare && chmod +x ./scripts/dev.sh && chmod +x ./scripts/build.sh",
+    "lint": "bun --bun prettier . --write && bun --bun eslint . --fix",
+    "build-gcc": "bun gcc-ts-bundler --src_dir='./content-src' --entry_point='./index.ts' --output_dir='./content-build' --language_out=ES6"
   },
   "sideEffects": [],
   "type": "module"
