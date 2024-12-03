@@ -31,10 +31,25 @@
     Readify - Chrome Web Store
 </a>
 
-### Manual Installation
+### Safari App Store
+
+<a href="https://www.apple.com/app-store/">
+    <img src="https://www.apple.com/v/app-store/b/images/overview/icon_appstore__ev0z770zyxoy_large_2x.png" width="24" height="24" style="vertical-align: middle; margin-right: 8px;" alt="Safari App Store">
+    Readify - Safari App Store (Coming Soon)
+</a>
+
+### Build Safari Extension from Source
+
+1. Clone the repository
+2. Open `./apple-platform/Readify/Readify.xcodeproj` in Xcode
+3. Select your development team in the project settings
+4. Build and run the project
+5. Enable the extension in Safari > Preferences > Extensions
+
+### Manual Installation for Chromium-based Browsers
 
 1. Download the latest release (.crx file) from the [Releases page](https://github.com/blueagler/readify/releases)
-2. Open Chrome and go to `chrome://extensions/`
+2. Open Chrome and go to `chrome://extensions/` or `edge://extensions/` for Microsoft Edge
 3. Enable "Developer mode" in the top right corner
 4. Drag and drop the downloaded .crx file into the extensions page
 
