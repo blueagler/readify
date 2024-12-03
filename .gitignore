@@ -1,6 +1,7 @@
-/.DS_Store
+.DS_Store
 /node_modules
 /bun.lockb
 /.wxt
 /content-build
 /extension-build
+/apple-platform/Readify/Shared (Extension)/Resources/**
