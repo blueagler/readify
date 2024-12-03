@@ -78,3 +78,9 @@ export function createBionicNode(
   fragment.appendChild(containerSpan);
   return fragment;
 }
+
+// self.onmessage = (event) => {
+//   const { text, config } = event.data;
+//   const fragment = createBionicNode(text, config);
+//   self.postMessage(fragment);
+// }

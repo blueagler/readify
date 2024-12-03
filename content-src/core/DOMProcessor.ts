@@ -183,13 +183,21 @@ export class DOMProcessor {
       [[], []],
     );
   }
-  private processNewContent(root: Element): void {
-    if (!root || this.isIgnored(root) || this.isProcessed(root)) return;
+  private processNewContent(root: Element | ShadowRoot): void {
+    if (!root || (root instanceof Element && (this.isIgnored(root) || this.isProcessed(root)))) return;
 
     queueMicrotask(() => {
       const elements = new Set<Element>();
       const elementsToObserve = new Set<Element>();
       const processedParents = new WeakSet<Element>();
+
+      const processShadowRoot = (element: Element) => {
+        const shadowRoot = element.shadowRoot;
+        if (shadowRoot) {
+          this.mutationObserver.observe(shadowRoot, this.$config.MUTATION.OPTIONS);
+          this.processNewContent(shadowRoot);
+        }
+      };
 
       const walker = document.createTreeWalker(
         root,
@@ -227,6 +235,11 @@ export class DOMProcessor {
             }
 
             if (!(node instanceof HTMLElement)) return NodeFilter.FILTER_SKIP;
+
+            // Check for shadow root
+            if (node.shadowRoot) {
+              processShadowRoot(node);
+            }
 
             if (
               this.isIgnored(node) ||
@@ -463,6 +476,20 @@ export class DOMProcessor {
   public $start(): void {
     this.processNewContent(document.body);
     this.mutationObserver.observe(document.body, this.$config.MUTATION.OPTIONS);
+    const shadowRoots = new Set<ShadowRoot>();
+    const findShadowRoots = (root: Element) => {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+      let node;
+      while ((node = walker.nextNode() as Element)) {
+        if (node.shadowRoot) {
+          shadowRoots.add(node.shadowRoot);
+          this.mutationObserver.observe(node.shadowRoot, this.$config.MUTATION.OPTIONS);
+        }
+      }
+    };
+
+    findShadowRoots(document.body);
+    shadowRoots.forEach(root => this.processNewContent(root));
   }
   public $stop(): void {
     this.intersectionObserver.disconnect();
