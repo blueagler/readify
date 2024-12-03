@@ -84,10 +84,7 @@ export class DOMProcessor {
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
       acceptNode: (node): number => {
         if (!(node instanceof HTMLElement)) return NodeFilter.FILTER_SKIP;
-        if (
-          this.processedElements.has(node) ||
-          this.observedElements.has(node)
-        ) {
+        if (this.isProcessed(node) || this.observedElements.has(node)) {
           return NodeFilter.FILTER_ACCEPT;
         }
         return NodeFilter.FILTER_SKIP;
@@ -128,13 +125,7 @@ export class DOMProcessor {
   private isBionicSpan(element: Element): boolean {
     if (!(element instanceof HTMLElement)) return false;
 
-    if (this.processedElements.has(element)) return true;
-
-    if (
-      element.parentElement &&
-      this.processedElements.has(element.parentElement)
-    )
-      return true;
+    if (this.isContentProcessed(element)) return true;
 
     if (element instanceof HTMLSpanElement) {
       if (
@@ -157,12 +148,12 @@ export class DOMProcessor {
   }
   private isContentProcessed(node: Node): boolean {
     if (node instanceof Element) {
-      if (this.processedElements.has(node)) return true;
+      if (this.isProcessed(node)) return true;
     }
 
     let parent = node.parentElement;
     while (parent) {
-      if (this.processedElements.has(parent)) return true;
+      if (this.isProcessed(parent)) return true;
       parent = parent.parentElement;
     }
 
@@ -193,7 +184,7 @@ export class DOMProcessor {
     );
   }
   private processNewContent(root: Element): void {
-    if (!root || this.isIgnored(root) || this.processingSet.has(root)) return;
+    if (!root || this.isIgnored(root) || this.isProcessed(root)) return;
 
     queueMicrotask(() => {
       const elements = new Set<Element>();
@@ -209,20 +200,11 @@ export class DOMProcessor {
               return NodeFilter.FILTER_REJECT;
             }
 
-            if (node instanceof Element) {
-              const parent = node.parentElement;
-              if (parent && processedParents.has(parent)) {
-                return NodeFilter.FILTER_REJECT;
-              }
-            }
-
             if (node.nodeType === Node.TEXT_NODE) {
               const parent = node.parentElement;
               if (!parent) return NodeFilter.FILTER_REJECT;
 
               if (
-                processedParents.has(parent) ||
-                this.processingSet.has(parent) ||
                 this.isIgnored(parent) ||
                 this.isEditableOrInteractive(parent) ||
                 this.isHighPerformanceElement(parent) ||
@@ -248,7 +230,6 @@ export class DOMProcessor {
 
             if (
               this.isIgnored(node) ||
-              this.processingSet.has(node) ||
               this.isEditableOrInteractive(node) ||
               this.isHighPerformanceElement(node) ||
               this.isBionicSpan(node)
@@ -301,7 +282,7 @@ export class DOMProcessor {
     this.isProcessing = false;
   }
   private processTextNodes(element: Element): void {
-    if (!this.shouldProcess(element) || this.processingSet.has(element)) return;
+    if (!this.shouldProcess(element) || this.isProcessed(element)) return;
 
     this.processingSet.add(element);
     const nodes = [];
@@ -310,11 +291,14 @@ export class DOMProcessor {
     let node;
     while ((node = walker.nextNode() as Text)) {
       if (
-        node.textContent?.trim() &&
-        !this.isContentProcessed(node) &&
-        !/^[\s…]+$/.test(node.textContent) &&
         node.parentElement &&
-        !this.isIgnored(node.parentElement)
+        node.textContent?.trim() &&
+        !/^[\s…]+$/.test(node.textContent) &&
+        !this.isIgnored(node.parentElement) &&
+        !this.isHidden(node.parentElement) &&
+        !this.isEditableOrInteractive(node.parentElement) &&
+        !this.isHighPerformanceElement(node.parentElement) &&
+        !this.isContentProcessed(node)
       ) {
         nodes.push(node);
       }
@@ -377,7 +361,7 @@ export class DOMProcessor {
           if (
             entry.isIntersecting &&
             entry.target instanceof Element &&
-            !this.processedElements.has(entry.target)
+            !this.isProcessed(entry.target)
           ) {
             this.queueTask(() => this.processTextNodes(entry.target));
             this.intersectionObserver.unobserve(entry.target);
@@ -394,7 +378,8 @@ export class DOMProcessor {
       mutations.forEach((mutation) => {
         const target = mutation.target;
         if (!target) return;
-        if (target instanceof Element && this.processingSet.has(target)) return;
+        if (target instanceof Element && this.isProcessed(target)) return;
+        if (target instanceof Element && this.isIgnored(target)) return;
         if (target instanceof Element && this.isEditableOrInteractive(target))
           return;
         if (target instanceof Element && this.isHighPerformanceElement(target))
@@ -425,11 +410,11 @@ export class DOMProcessor {
   private shouldProcess(element: Element): boolean {
     if (
       !(element instanceof HTMLElement) ||
-      this.isContentProcessed(element) ||
-      this.checkElementType(element, ElementCheckType.Ignored) ||
-      this.checkElementType(element, ElementCheckType.Editable) ||
-      this.checkElementType(element, ElementCheckType.Hidden) ||
-      this.checkElementType(element, ElementCheckType.HighPerformance)
+      this.isIgnored(element) ||
+      this.isHidden(element) ||
+      this.isEditableOrInteractive(element) ||
+      this.isHighPerformanceElement(element) ||
+      this.isContentProcessed(element)
     ) {
       return false;
     }
