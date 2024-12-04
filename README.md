@@ -26,7 +26,7 @@
 
 ### Chrome Web Store
 
-<a href="https://chromewebstore.google.com/detail/readify/agpjakbhkbidmhaejemhmlcdgdcopnij">
+<a href="https://chromewebstore.google.com/detail/readify-bionic-reading-as/agpjakbhkbidmhaejemhmlcdgdcopnij">
     <img src="https://fonts.gstatic.com/s/i/productlogos/chrome_store/v7/192px.svg" width="24" height="24" style="vertical-align: middle; margin-right: 8px;" alt="Chrome Web Store">
     Readify - Chrome Web Store
 </a>
