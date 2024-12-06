@@ -84,13 +84,6 @@ function getAvailableFontWeights(element: Element): number[] {
     : STANDARD_WEIGHTS;
 }
 
-function isVariableFont(element: Element): boolean {
-  return window
-    .getComputedStyle(element)
-    .getPropertyValue("font-variation-settings")
-    .includes("wght");
-}
-
 export interface CalculateWeightResult {
   boldWeight: number;
   normalWeight: number;
@@ -98,16 +91,15 @@ export interface CalculateWeightResult {
 }
 
 export function calculateWeight(element: Element): CalculateWeightResult {
-  const isVariable = isVariableFont(element);
   const elementStyle = window.getComputedStyle(element);
+  const fontVariationSettings = elementStyle.getPropertyValue(
+    "font-variation-settings",
+  );
+  const isVariable = fontVariationSettings.includes("wght");
+
   const originalWeight =
     (isVariable
-      ? parseInt(
-          elementStyle
-            .getPropertyValue("font-variation-settings")
-            .split(" ")[1],
-          10,
-        )
+      ? parseInt(fontVariationSettings.split(" ")[1], 10)
       : parseInt(elementStyle.fontWeight, 10)) ||
     parseInt(window.getComputedStyle(document.body).fontWeight, 10) ||
     400;
