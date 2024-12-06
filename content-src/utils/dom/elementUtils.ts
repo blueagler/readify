@@ -75,8 +75,8 @@ function getAvailableFontWeights(element: Element): number[] {
   if (!fontFamily) return STANDARD_WEIGHTS;
   const availableWeights = document.fonts.check(`1px ${fontFamily}`)
     ? Array.from(document.fonts)
-        .filter((font) => font.family === fontFamily.replace(/['"]/g, ""))
-        .map((font) => parseInt(font.weight))
+      .filter((font) => font.family === fontFamily.replace(/['"]/g, ""))
+      .map((font) => parseInt(font.weight))
     : STANDARD_WEIGHTS;
 
   return availableWeights.length > 0
@@ -98,12 +98,16 @@ export interface CalculateWeightResult {
 }
 
 export function calculateWeight(element: Element): CalculateWeightResult {
-  const originalWeight =
-    parseInt(window.getComputedStyle(element).fontWeight, 10) ||
-    parseInt(window.getComputedStyle(document.body).fontWeight, 10) ||
-    400;
   const isVariable = isVariableFont(element);
-  const availableWeights = getAvailableFontWeights(element);
+  const elementStyle = window.getComputedStyle(element);
+  const originalWeight =
+    (isVariable ?
+      parseInt(elementStyle.getPropertyValue("font-variation-settings").split(" ")[1], 10)
+      : parseInt(elementStyle.fontWeight, 10))
+    || parseInt(window.getComputedStyle(document.body).fontWeight, 10) || 400;
+
+  const availableWeights = isVariable ? [] : getAvailableFontWeights(element);
+
   const desiredBoldWeight =
     originalWeight >= 600
       ? 900
