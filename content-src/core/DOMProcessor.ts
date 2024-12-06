@@ -284,7 +284,6 @@ export class DOMProcessor {
 
             if (!(node instanceof HTMLElement)) return NodeFilter.FILTER_SKIP;
 
-            // Check for shadow root
             if (node.shadowRoot) {
               processShadowRoot(node);
             }
