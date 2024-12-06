@@ -1,7 +1,7 @@
 {
   "name": "readify",
   "description": "Readify is a browser extension that enhances reading experience by applying bionic reading patterns to web content.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "devDependencies": {
     "@types/bun": "1.1.14",
     "@types/chrome": "0.0.287",
@@ -24,7 +24,7 @@
     "build": "./scripts/build.sh",
     "postinstall": "wxt prepare && chmod +x ./scripts/dev.sh && chmod +x ./scripts/build.sh",
     "lint": "bun --bun prettier . --write && bun --bun eslint . --fix",
-    "build-gcc": "bun gcc-ts-bundler --src_dir='./content-src' --entry_point='./index.ts' --output_dir='./content-build' --language_out=ES6"
+    "build-gcc": "bun gcc-ts-bundler --src_dir='./content-src' --entry_point='./index.ts' --output_dir='./content-build' --language_out=ECMASCRIPT_2019"
   },
   "sideEffects": [],
   "type": "module"
