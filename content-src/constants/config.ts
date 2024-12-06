@@ -405,8 +405,9 @@ const DOM_SELECTORS = {
       ATTRIBUTE_VALUES: [
         ["contenteditable", "true"],
         ["contenteditable", "plaintext-only"],
+        ["contenteditable", ""],
       ],
-      ATTRIBUTES: ["contenteditable", "ng-model", "v-model", "data-reactroot"],
+      ATTRIBUTES: ["ng-model", "v-model", "data-reactroot"],
       CLASS_NAMES: [
         "editable",
         "editor",
@@ -436,7 +437,10 @@ const DOM_SELECTORS = {
       TAGS: ["INPUT", "TEXTAREA", "SELECT", "BUTTON", "OPTION"],
     },
     [ElementCheckType.Hidden]: {
-      ATTRIBUTES: ["aria-hidden"],
+      ATTRIBUTE_VALUES: [
+        ["aria-hidden", "true"],
+        ["aria-hidden", ""],
+      ],
       CLASS_NAMES: ["code", "math", "syntax"],
       STYLES: [
         ["display", "none"],
@@ -467,7 +471,6 @@ const DOM_SELECTORS = {
         "echarts",
         "visualization",
       ],
-      ROLES: ["presentation"],
       TAGS: ["CANVAS", "OBJECT", "EMBED"],
     },
     [ElementCheckType.Ignored]: {
@@ -529,6 +532,7 @@ const DOM_SELECTORS = {
         "ROUTER-VIEW",
         "ROUTER-LINK",
       ],
+      CLASS_NAMES: ["button", "icon", "logo", "badge", "avatar", "spinner"],
     },
   },
 } as const;

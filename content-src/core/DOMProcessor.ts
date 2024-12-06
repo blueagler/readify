@@ -21,6 +21,7 @@ export class DOMProcessor {
   private processingSet = new WeakSet<Element>();
   private taskBuffer: Element[] = [];
   private taskQueue: (() => void)[] = [];
+  private parentTypeCheckCache = new WeakMap<Element, Map<string, boolean>>();
   constructor(config?: Partial<CustomizedConfig>) {
     this.$config.BIONIC.boldFactor =
       config?.boldFactor || this.$config.BIONIC.boldFactor;
@@ -35,47 +36,6 @@ export class DOMProcessor {
       this.$config.BIONIC.syllableExceptions.set(key, value),
     );
     this.setupObservers();
-  }
-  private checkElementType(element: Element, type: ElementCheckType): boolean {
-    if (!(element instanceof HTMLElement)) return false;
-    const config = this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type];
-    if (config.TAGS?.includes(element.tagName)) return true;
-    if (type === ElementCheckType.Editable && element.isContentEditable)
-      return true;
-    if (config.ATTRIBUTES?.some((attr) => element.hasAttribute(attr)))
-      return true;
-    if (
-      config.ATTRIBUTE_VALUES?.some(
-        ([attr, value]) => element.getAttribute(attr) === value,
-      )
-    )
-      return true;
-    if (
-      config.CLASS_NAMES?.some(
-        (className) =>
-          typeof element.className === "string" &&
-          element.className.includes(className),
-      )
-    )
-      return true;
-    if (
-      config.STYLES?.some(
-        ([prop, value]) =>
-          window.getComputedStyle(element)[prop as any] === value,
-      )
-    )
-      return true;
-    if (
-      config.ROLES &&
-      element.hasAttribute("role") &&
-      config.ROLES.includes(element.getAttribute("role")?.toLowerCase() || "")
-    ) {
-      return true;
-    }
-    return (
-      config.CLOSEST?.some((selector) => element.closest(selector) !== null) ??
-      false
-    );
   }
   private cleanupRemovedElement(root: Element): void {
     this.observedElements.delete(root);
@@ -122,22 +82,6 @@ export class DOMProcessor {
       }
     });
   }
-  private isBionicSpan(element: Element): boolean {
-    if (!(element instanceof HTMLElement)) return false;
-
-    if (this.isContentProcessed(element)) return true;
-
-    if (element instanceof HTMLSpanElement) {
-      if (
-        element.firstElementChild instanceof HTMLElement &&
-        element.firstElementChild.tagName === "STRONG"
-      ) {
-        return true;
-      }
-    }
-
-    return false;
-  }
   private isChildOfPendingElements(
     element: Element,
     elements: Element[],
@@ -166,18 +110,6 @@ export class DOMProcessor {
 
     return false;
   }
-  private isEditableOrInteractive(element: Element): boolean {
-    return this.checkElementType(element, ElementCheckType.Editable);
-  }
-  private isHidden(element: Element): boolean {
-    return this.checkElementType(element, ElementCheckType.Hidden);
-  }
-  private isHighPerformanceElement(element: Element): boolean {
-    return this.checkElementType(element, ElementCheckType.HighPerformance);
-  }
-  private isIgnored(element: Element): boolean {
-    return this.checkElementType(element, ElementCheckType.Ignored);
-  }
   private isProcessed(element: Element): boolean {
     return this.processedElements.has(element);
   }
@@ -190,11 +122,111 @@ export class DOMProcessor {
       [[], []],
     );
   }
+  private checkElementTypes(
+    element: Element,
+    types: ElementCheckType[],
+  ): boolean {
+    if (!(element instanceof HTMLElement)) return false;
+    if (types.includes(ElementCheckType.Editable) && element.isContentEditable)
+      return true;
+
+    const config = types.reduce(
+      (acc, type) => {
+        return {
+          TAGS: acc.TAGS?.concat(
+            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].TAGS || [],
+          ),
+          ATTRIBUTES: acc.ATTRIBUTES?.concat(
+            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].ATTRIBUTES || [],
+          ),
+          ATTRIBUTE_VALUES: acc.ATTRIBUTE_VALUES?.concat(
+            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].ATTRIBUTE_VALUES ||
+              [],
+          ),
+          CLASS_NAMES: acc.CLASS_NAMES?.concat(
+            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].CLASS_NAMES || [],
+          ),
+          STYLES: acc.STYLES?.concat(
+            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].STYLES || [],
+          ),
+          ROLES: acc.ROLES?.concat(
+            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].ROLES || [],
+          ),
+          CLOSEST: acc.CLOSEST?.concat(
+            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].CLOSEST || [],
+          ),
+        };
+      },
+      {
+        TAGS: [],
+        ATTRIBUTES: [],
+        ATTRIBUTE_VALUES: [],
+        CLASS_NAMES: [],
+        STYLES: [],
+        ROLES: [],
+        CLOSEST: [],
+      } as ProcessorConfig["DOM_SELECTORS"]["ELEMENT_CHECKS"][ElementCheckType],
+    );
+
+    if (
+      config.TAGS?.includes(element.tagName) ||
+      config.ATTRIBUTES?.some((attr) => element.hasAttribute(attr)) ||
+      config.ATTRIBUTE_VALUES?.some(
+        ([attr, value]) => element.getAttribute(attr) === value,
+      ) ||
+      config.CLASS_NAMES?.some(
+        (className) =>
+          typeof element.className === "string" &&
+          element.className.includes(className),
+      ) ||
+      config.STYLES?.some(
+        ([prop, value]) =>
+          window.getComputedStyle(element)[prop as any] === value,
+      ) ||
+      (config.ROLES &&
+        element.hasAttribute("role") &&
+        config.ROLES.includes(
+          element.getAttribute("role")?.toLowerCase() || "",
+        )) ||
+      config.CLOSEST?.some((selector) => element.closest(selector) !== null)
+    ) {
+      return true;
+    }
+
+    let parent = element.parentElement;
+    while (parent) {
+      const cacheKey = types.join(",");
+
+      let parentCache = this.parentTypeCheckCache.get(parent);
+      if (parentCache) {
+        const cachedResult = parentCache.get(cacheKey);
+        if (cachedResult !== undefined) {
+          return cachedResult;
+        }
+      } else {
+        parentCache = new Map();
+        this.parentTypeCheckCache.set(parent, parentCache);
+      }
+
+      const result = this.checkElementTypes(parent, types);
+
+      parentCache.set(cacheKey, result);
+
+      if (result) {
+        return true;
+      }
+
+      parent = parent.parentElement;
+    }
+
+    return false;
+  }
   private processNewContent(root: Element | ShadowRoot): void {
     if (
       !root ||
       (root instanceof Element &&
-        (this.isIgnored(root) || this.isProcessed(root)))
+        (this.checkElementTypes(root, [ElementCheckType.Ignored]) ||
+          this.isProcessed(root)))
     )
       return;
 
@@ -228,10 +260,11 @@ export class DOMProcessor {
               if (!parent) return NodeFilter.FILTER_REJECT;
 
               if (
-                this.isIgnored(parent) ||
-                this.isEditableOrInteractive(parent) ||
-                this.isHighPerformanceElement(parent) ||
-                this.isBionicSpan(parent)
+                this.checkElementTypes(parent, [
+                  ElementCheckType.Ignored,
+                  ElementCheckType.Editable,
+                  ElementCheckType.HighPerformance,
+                ])
               ) {
                 return NodeFilter.FILTER_REJECT;
               }
@@ -257,10 +290,11 @@ export class DOMProcessor {
             }
 
             if (
-              this.isIgnored(node) ||
-              this.isEditableOrInteractive(node) ||
-              this.isHighPerformanceElement(node) ||
-              this.isBionicSpan(node)
+              this.checkElementTypes(node, [
+                ElementCheckType.Ignored,
+                ElementCheckType.Editable,
+                ElementCheckType.HighPerformance,
+              ])
             ) {
               return NodeFilter.FILTER_REJECT;
             }
@@ -322,10 +356,12 @@ export class DOMProcessor {
         node.parentElement &&
         node.textContent?.trim() &&
         !/^[\s…]+$/.test(node.textContent) &&
-        !this.isIgnored(node.parentElement) &&
-        !this.isHidden(node.parentElement) &&
-        !this.isEditableOrInteractive(node.parentElement) &&
-        !this.isHighPerformanceElement(node.parentElement) &&
+        !this.checkElementTypes(node.parentElement, [
+          ElementCheckType.Ignored,
+          ElementCheckType.Hidden,
+          ElementCheckType.Editable,
+          ElementCheckType.HighPerformance,
+        ]) &&
         !this.isContentProcessed(node)
       ) {
         nodes.push(node);
@@ -333,7 +369,12 @@ export class DOMProcessor {
     }
 
     nodes.forEach((node) => {
-      const processedNode = createBionicNode(node.textContent!, this.$config);
+      const processedNode = createBionicNode(
+        node.textContent!,
+        this.$config,
+        node.parentNode!,
+      );
+      if (!processedNode) return;
       node.parentNode!.replaceChild(processedNode, node);
     });
 
@@ -405,12 +446,16 @@ export class DOMProcessor {
       const debounceSet = new WeakSet<Element>();
       mutations.forEach((mutation) => {
         const target = mutation.target;
-        if (!target) return;
-        if (target instanceof Element && this.isProcessed(target)) return;
-        if (target instanceof Element && this.isIgnored(target)) return;
-        if (target instanceof Element && this.isEditableOrInteractive(target))
-          return;
-        if (target instanceof Element && this.isHighPerformanceElement(target))
+        if (!target || !(target instanceof Node)) return;
+        if (
+          target instanceof Element &&
+          (this.isProcessed(target) ||
+            this.checkElementTypes(target, [
+              ElementCheckType.Ignored,
+              ElementCheckType.Editable,
+              ElementCheckType.HighPerformance,
+            ]))
+        )
           return;
         if (mutation.type === "childList" && mutation.removedNodes.length > 0) {
           mutation.removedNodes.forEach((node) => {
@@ -438,10 +483,12 @@ export class DOMProcessor {
   private shouldProcess(element: Element): boolean {
     if (
       !(element instanceof HTMLElement) ||
-      this.isIgnored(element) ||
-      this.isHidden(element) ||
-      this.isEditableOrInteractive(element) ||
-      this.isHighPerformanceElement(element) ||
+      this.checkElementTypes(element, [
+        ElementCheckType.Ignored,
+        ElementCheckType.Hidden,
+        ElementCheckType.Editable,
+        ElementCheckType.HighPerformance,
+      ]) ||
       this.isContentProcessed(element)
     ) {
       return false;
