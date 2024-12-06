@@ -1,6 +1,7 @@
 import { PROCESSOR_CONFIG } from "../constants/config";
 import { CustomizedConfig, ElementCheckType, ProcessorConfig } from "../types";
 import {
+  calculateWeight,
   getElementPosition,
   isElementVisible,
 } from "../utils/dom/elementUtils";
@@ -367,11 +368,13 @@ export class DOMProcessor {
       }
     }
 
+    const calculatedWeights = calculateWeight(element);
+
     nodes.forEach((node) => {
       const processedNode = createBionicNode(
         node.textContent!,
         this.$config,
-        node.parentNode!,
+        calculatedWeights,
       );
       if (!processedNode) return;
       node.parentNode!.replaceChild(processedNode, node);

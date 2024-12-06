@@ -61,3 +61,76 @@ export function getElementPosition(element: Element): ElementPosition {
     $y: offsetY,
   };
 }
+
+const STANDARD_WEIGHTS = [100, 200, 300, 400, 500, 600, 700, 800, 900];
+
+function findClosestWeight(target: number, availableWeights: number[]): number {
+  return availableWeights.reduce((prev, curr) =>
+    Math.abs(curr - target) < Math.abs(prev - target) ? curr : prev,
+  );
+}
+
+function getAvailableFontWeights(element: Element): number[] {
+  const fontFamily = window.getComputedStyle(element).fontFamily;
+  if (!fontFamily) return STANDARD_WEIGHTS;
+  const availableWeights = document.fonts.check(`1px ${fontFamily}`)
+    ? Array.from(document.fonts)
+        .filter((font) => font.family === fontFamily.replace(/['"]/g, ""))
+        .map((font) => parseInt(font.weight))
+    : STANDARD_WEIGHTS;
+
+  return availableWeights.length > 0
+    ? availableWeights.sort((a, b) => a - b)
+    : STANDARD_WEIGHTS;
+}
+
+function isVariableFont(element: Element): boolean {
+  return window
+    .getComputedStyle(element)
+    .getPropertyValue("font-variation-settings")
+    .includes("wght");
+}
+
+export interface CalculateWeightResult {
+  boldWeight: number;
+  normalWeight: number;
+  isVariable: boolean;
+}
+
+export function calculateWeight(element: Element): CalculateWeightResult {
+  const originalWeight =
+    parseInt(window.getComputedStyle(element).fontWeight, 10) ||
+    parseInt(window.getComputedStyle(document.body).fontWeight, 10) ||
+    400;
+  const isVariable = isVariableFont(element);
+  const availableWeights = getAvailableFontWeights(element);
+  const desiredBoldWeight =
+    originalWeight >= 600
+      ? 900
+      : Math.min(900, Math.round(originalWeight * 1.5));
+  const desiredNormalWeight = Math.min(600, originalWeight);
+
+  const boldWeight = isVariable
+    ? desiredBoldWeight
+    : findClosestWeight(desiredBoldWeight, availableWeights);
+  const normalWeight = isVariable
+    ? desiredNormalWeight
+    : findClosestWeight(desiredNormalWeight, availableWeights);
+
+  return {
+    boldWeight,
+    normalWeight,
+    isVariable,
+  };
+}
+
+export function setFontWeight(
+  element: HTMLElement,
+  weight: number,
+  isVariable: boolean,
+): void {
+  element.style.setProperty("font-weight", `${weight}`);
+  if (isVariable) {
+    element.style.setProperty("font-variation-settings", `'wght' ${weight}`);
+  }
+}
