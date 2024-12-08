@@ -370,7 +370,6 @@ export class DOMProcessor {
     }
 
     const calculatedWeights = calculateWeight(element);
-    element.classList.add(BIONIC_IGNORED_CLASS);
     (element as HTMLElement).style.setProperty(
       "--a",
       `${calculatedWeights.normalWeight}`,
@@ -387,11 +386,7 @@ export class DOMProcessor {
     );
 
     nodes.forEach((node) => {
-      const processedNode = createBionicNode(
-        node.textContent!,
-        this.$config,
-        calculatedWeights,
-      );
+      const processedNode = createBionicNode(node.textContent!, this.$config);
       if (!processedNode) return;
       node.parentNode!.replaceChild(processedNode, node);
     });

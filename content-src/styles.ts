@@ -2,17 +2,19 @@ function generateClassName(id: string): string {
   return `_${id}${Math.random().toString(36).substr(2, 9)}`;
 }
 
-export const BIONIC_IGNORED_CLASS = generateClassName("i");
-export const BIONIC_CLASS = generateClassName("_");
+export const BIONIC_IGNORED_CLASS = generateClassName("_");
+export const BIONIC_CLASS = generateClassName("");
 
 export function initReadifyStyles() {
   injectStyles({
     [BIONIC_IGNORED_CLASS]: {
       fontWeight: "var(--a)",
+      display: "inline",
     },
     [BIONIC_CLASS]: {
       fontWeight: "var(--b)",
       fontVariationSettings: "var(--c)",
+      display: "inline",
     },
   });
 }
