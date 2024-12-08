@@ -15,7 +15,7 @@ export function isElementVisible(element: Element): boolean {
       return false;
     }
 
-    const root = current.getRootNode();
+    const root = current.getRootNode() as Document | ShadowRoot;
     current =
       current.parentElement ||
       (root instanceof ShadowRoot && root.host instanceof Element

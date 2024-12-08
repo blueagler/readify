@@ -1,5 +1,6 @@
 const originalRemoveChild = Node.prototype.removeChild;
 const originalReplaceChild = Node.prototype.replaceChild;
+const originalInsertBefore = Node.prototype.insertBefore;
 
 const modifiedNodes = new WeakSet<Node>();
 
@@ -14,18 +15,20 @@ function isEquivalentNode<T extends Node>(node: Node, target: T): boolean {
   );
 }
 
-function safeRemoveChild<T extends Node>(parent: Node, child: T): T {
-  if (child.parentNode === parent) {
-    return originalRemoveChild.call(parent, child) as T;
-  }
-  const actualChild = Array.from(parent.childNodes).find(
-    (node) =>
-      node instanceof child.constructor && isEquivalentNode(node, child),
+function findActualChild<T extends Node>(parent: Node, child: T): Node | null {
+  if (child.parentNode === parent) return child;
+  return (
+    Array.from(parent.childNodes).find(
+      (node) =>
+        node instanceof child.constructor && isEquivalentNode(node, child),
+    ) || null
   );
-  if (actualChild) {
-    return originalRemoveChild.call(parent, actualChild) as T;
-  }
-  return child;
+}
+
+function safeRemoveChild<T extends Node>(parent: Node, child: T): T {
+  const actualChild = findActualChild(parent, child);
+  if (!actualChild) return child;
+  return originalRemoveChild.call(parent, actualChild) as T;
 }
 
 function safeReplaceChild<T extends Node>(
@@ -33,19 +36,26 @@ function safeReplaceChild<T extends Node>(
   newChild: Node,
   oldChild: T,
 ): T {
-  if (oldChild.parentNode === parent) {
-    modifiedNodes.add(newChild);
-    return originalReplaceChild.call(parent, newChild, oldChild) as T;
+  const actualChild = findActualChild(parent, oldChild);
+  if (!actualChild) return oldChild;
+  modifiedNodes.add(newChild);
+  return originalReplaceChild.call(parent, newChild, actualChild) as T;
+}
+
+function safeInsertBefore<T extends Node>(
+  parent: Node,
+  newChild: T,
+  referenceNode: Node | null,
+): T {
+  if (!referenceNode) {
+    return parent.appendChild(newChild);
   }
-  const actualChild = Array.from(parent.childNodes).find(
-    (node) =>
-      node instanceof oldChild.constructor && isEquivalentNode(node, oldChild),
-  );
-  if (actualChild) {
-    modifiedNodes.add(newChild);
-    return originalReplaceChild.call(parent, newChild, actualChild) as T;
+  const actualReference = findActualChild(parent, referenceNode);
+  if (!actualReference) {
+    return parent.appendChild(newChild);
   }
-  return oldChild;
+  modifiedNodes.add(newChild);
+  return originalInsertBefore.call(parent, newChild, actualReference) as T;
 }
 
 export function patchDOMMethods(): void {
@@ -59,9 +69,17 @@ export function patchDOMMethods(): void {
   ): T {
     return safeReplaceChild(this, newChild, oldChild);
   };
+
+  Node.prototype.insertBefore = function <T extends Node>(
+    newChild: T,
+    referenceNode: Node | null,
+  ): T {
+    return safeInsertBefore(this, newChild, referenceNode);
+  };
 }
 
 export function restoreDOMMethods(): void {
   Node.prototype.removeChild = originalRemoveChild;
   Node.prototype.replaceChild = originalReplaceChild;
+  Node.prototype.insertBefore = originalInsertBefore;
 }
