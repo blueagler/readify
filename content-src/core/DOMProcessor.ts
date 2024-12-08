@@ -1,5 +1,10 @@
 import { PROCESSOR_CONFIG } from "../constants/config";
-import { BIONIC_IGNORED_CLASS } from "../styles";
+import {
+  BIONIC_BOLD_FONT_VARIATION,
+  BIONIC_BOLD_FONT_WEIGHT,
+  BIONIC_FONT_WEIGHT,
+  BIONIC_IGNORED_CLASS,
+} from "../styles";
 import { CustomizedConfig, ElementCheckType, ProcessorConfig } from "../types";
 import {
   calculateWeight,
@@ -371,15 +376,15 @@ export class DOMProcessor {
 
     const calculatedWeights = calculateWeight(element);
     (element as HTMLElement).style.setProperty(
-      "--a",
+      BIONIC_FONT_WEIGHT,
       `${calculatedWeights.normalWeight}`,
     );
     (element as HTMLElement).style.setProperty(
-      "--b",
+      BIONIC_BOLD_FONT_WEIGHT,
       `${calculatedWeights.boldWeight}`,
     );
     (element as HTMLElement).style.setProperty(
-      "--c",
+      BIONIC_BOLD_FONT_VARIATION,
       calculatedWeights.isVariable
         ? `${calculatedWeights.boldWeight}`
         : "normal",
