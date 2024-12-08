@@ -6,8 +6,16 @@ const originalGetAttribute = Element.prototype.getAttribute;
 const modifiedNodes = new WeakSet<Node>();
 const originalNodes = new WeakMap<Node, Node>();
 
+function isClonableNode(node: Node): boolean {
+  return (
+    !(node instanceof ShadowRoot) &&
+    !(node instanceof DocumentType) &&
+    !(node instanceof DocumentFragment)
+  );
+}
+
 function preserveOriginalNode(node: Node): void {
-  if (!originalNodes.has(node)) {
+  if (!originalNodes.has(node) && isClonableNode(node)) {
     originalNodes.set(node, node.cloneNode(true));
   }
 }
@@ -28,6 +36,16 @@ function isEquivalentNode<T extends Node>(node: Node, target: T): boolean {
 }
 
 function findActualChild<T extends Node>(parent: Node, child: T): Node | null {
+  if (!isClonableNode(parent)) {
+    if (child.parentNode === parent) return child;
+    return (
+      Array.from(parent.childNodes).find(
+        (node) =>
+          node instanceof child.constructor && isEquivalentNode(node, child),
+      ) || null
+    );
+  }
+
   const original = getOriginalNode(parent);
   if (original) {
     const originalChild = Array.from(original.childNodes).find(
@@ -106,7 +124,11 @@ export function patchDOMMethods(): void {
     return safeInsertBefore(this, newChild, referenceNode);
   };
 
+  const originalGetAttribute = Element.prototype.getAttribute;
   Element.prototype.getAttribute = function (name: string): string | null {
+    if (!isClonableNode(this)) {
+      return originalGetAttribute.call(this, name);
+    }
     const original = getOriginalNode(this);
     if (original instanceof Element) {
       return originalGetAttribute.call(original, name);
