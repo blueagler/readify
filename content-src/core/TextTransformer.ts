@@ -1,8 +1,6 @@
+import { BIONIC_CLASS, BIONIC_IGNORED_CLASS } from "../styles";
 import { ProcessorConfig } from "../types";
-import {
-  CalculateWeightResult,
-  setFontWeight,
-} from "../utils/dom/elementUtils";
+import { CalculateWeightResult } from "../utils/dom/elementUtils";
 import { isSpecialCharacter, splitIntoWords } from "../utils/text/textUtils";
 import { findEnglishRanges } from "../utils/text/textUtils";
 import { analyzeWord } from "../utils/text/wordAnalyzer";
@@ -27,11 +25,7 @@ export function createBionicNode(
 
   const fragment = document.createDocumentFragment();
   const containerSpan = document.createElement("span");
-  setFontWeight(
-    containerSpan,
-    calculatedWeights.normalWeight,
-    calculatedWeights.isVariable,
-  );
+  containerSpan.classList.add(BIONIC_CLASS);
 
   englishRanges.sort((a, b) => a.$start - b.$start);
 
@@ -55,22 +49,14 @@ export function createBionicNode(
 
       const wordSpan = document.createElement("span");
 
-      const strong = document.createElement("strong");
-      setFontWeight(
-        strong,
-        calculatedWeights.boldWeight,
-        calculatedWeights.isVariable,
-      );
+      const strong = document.createElement("span");
+      strong.classList.add(BIONIC_CLASS);
       strong.textContent = word.slice(0, boldLength);
       wordSpan.append(strong);
 
       if (boldLength < word.length) {
         const remaining = document.createElement("span");
-        setFontWeight(
-          remaining,
-          calculatedWeights.normalWeight,
-          calculatedWeights.isVariable,
-        );
+        remaining.classList.add(BIONIC_IGNORED_CLASS);
         remaining.textContent = word.slice(boldLength);
         wordSpan.append(remaining);
       }

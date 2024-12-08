@@ -5,7 +5,7 @@ set -e
 echo "🚀 Starting Readify development environment..."
 
 echo "📦 Building initial content script..."
-bun run build-gcc
+bun run ./scripts/build-content.ts
 
 echo "🔧 Starting WXT dev server..."
 bun wxt &
@@ -16,7 +16,7 @@ while true; do
     read -r
 
     echo "🔄 Rebuilding content script..."
-    bun run build-gcc
+    bun run ./scripts/build-content.ts
     sleep 1
 
     echo "🔄 Triggering WXT reload..."

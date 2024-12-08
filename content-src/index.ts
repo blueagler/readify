@@ -1,14 +1,10 @@
 import { Readify } from "./Readify";
 
-let instance: null | Readify = null;
+let instance: Readify | null = null;
 
-export const start = () => {
+export const start = async () => {
   instance = Readify.init({
     boldCommonWords: true,
     boldSingleSyllables: true,
   });
 };
-
-// export const stop = () => {
-//   instance?.$stop();
-// };

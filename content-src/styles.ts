@@ -1,9 +1,18 @@
-import { STYLE_CLASSES } from "./constants/config";
+function generateClassName(id: string): string {
+  return `_${id}${Math.random().toString(36).substr(2, 9)}`;
+}
+
+export const BIONIC_IGNORED_CLASS = generateClassName("i");
+export const BIONIC_CLASS = generateClassName("_");
 
 export function initReadifyStyles() {
   injectStyles({
-    [STYLE_CLASSES.BIONIC_IGNORED]: {
-      // Keep any other styles you need
+    [BIONIC_IGNORED_CLASS]: {
+      fontWeight: "var(--a)",
+    },
+    [BIONIC_CLASS]: {
+      fontWeight: "var(--b)",
+      fontVariationSettings: "var(--c)",
     },
   });
 }

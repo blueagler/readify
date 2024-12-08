@@ -125,14 +125,3 @@ export function calculateWeight(element: Element): CalculateWeightResult {
     isVariable,
   };
 }
-
-export function setFontWeight(
-  element: HTMLElement,
-  weight: number,
-  isVariable: boolean,
-): void {
-  element.style.setProperty("font-weight", `${weight}`);
-  if (isVariable) {
-    element.style.setProperty("font-variation-settings", `'wght' ${weight}`);
-  }
-}

@@ -5,7 +5,7 @@ set -e
 echo "🚀 Building Readify extension..."
 
 echo "📦 Building content script..."
-bun run build-gcc
+bun run ./scripts/build-content.ts
 
 echo "🛠 Building for Chrome/Edge..."
 bun wxt zip &

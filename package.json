@@ -22,9 +22,9 @@
   "scripts": {
     "dev": "./scripts/dev.sh",
     "build": "./scripts/build.sh",
+    "build-content": "bun run ./scripts/build-content.ts",
     "postinstall": "wxt prepare && chmod +x ./scripts/dev.sh && chmod +x ./scripts/build.sh",
-    "lint": "bun --bun prettier . --write && bun --bun eslint . --fix",
-    "build-gcc": "bun gcc-ts-bundler --src_dir='./content-src' --entry_point='./index.ts' --output_dir='./content-build' --language_out=ECMASCRIPT_2019"
+    "lint": "bun --bun prettier . --write && bun --bun eslint . --fix"
   },
   "sideEffects": [],
   "type": "module"

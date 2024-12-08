@@ -13,11 +13,6 @@ export const pixelRatio = window.devicePixelRatio || 1;
 export const screenWidth = window.innerWidth;
 export const screenHeight = window.innerHeight;
 
-export const STYLE_CLASSES = {
-  BIONIC_IGNORED: "readify-bionic-ignored",
-  BIONIC_SALIENCED: "readify-bionic-salienced",
-};
-
 const MUTATION: MutationConfig = {
   DEBOUNCE_DELAY: 100,
   OPTIONS: {

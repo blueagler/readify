@@ -1,4 +1,5 @@
 import { PROCESSOR_CONFIG } from "../constants/config";
+import { BIONIC_IGNORED_CLASS } from "../styles";
 import { CustomizedConfig, ElementCheckType, ProcessorConfig } from "../types";
 import {
   calculateWeight,
@@ -351,7 +352,7 @@ export class DOMProcessor {
     const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
 
     let node;
-    while ((node = walker.nextNode() as Text)) {
+    while ((node = walker.nextNode())) {
       if (
         node.parentElement &&
         node.textContent?.trim() &&
@@ -369,6 +370,21 @@ export class DOMProcessor {
     }
 
     const calculatedWeights = calculateWeight(element);
+    element.classList.add(BIONIC_IGNORED_CLASS);
+    (element as HTMLElement).style.setProperty(
+      "--a",
+      `${calculatedWeights.normalWeight}`,
+    );
+    (element as HTMLElement).style.setProperty(
+      "--b",
+      `${calculatedWeights.boldWeight}`,
+    );
+    (element as HTMLElement).style.setProperty(
+      "--c",
+      calculatedWeights.isVariable
+        ? `${calculatedWeights.boldWeight}`
+        : "normal",
+    );
 
     nodes.forEach((node) => {
       const processedNode = createBionicNode(

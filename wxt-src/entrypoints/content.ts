@@ -1,6 +1,6 @@
 import { defineContentScript } from "wxt/sandbox";
 //@ts-expect-error - This is a fake import
-import { start } from "../../content-build/index.js";
+import { start } from "../../content-build/content.js";
 
 export default defineContentScript({
   allFrames: true,
