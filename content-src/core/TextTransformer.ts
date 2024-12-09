@@ -1,4 +1,9 @@
-import { BIONIC_CLASS, BIONIC_IGNORED_CLASS } from "../styles";
+import {
+  BIONIC_CLASS,
+  BIONIC_IGNORED_CLASS,
+  BIONIC_TAG_NAME,
+  generateName,
+} from "../styles";
 import { ProcessorConfig } from "../types";
 import { isSpecialCharacter, splitIntoWords } from "../utils/text/textUtils";
 import { findEnglishRanges } from "../utils/text/textUtils";
@@ -22,7 +27,7 @@ export function createBionicNode(
   }
 
   const fragment = document.createDocumentFragment();
-  const containerSpan = document.createElement("div");
+  const containerSpan = document.createElement(BIONIC_TAG_NAME);
   containerSpan.classList.add(BIONIC_IGNORED_CLASS);
 
   englishRanges.sort((a, b) => a.$start - b.$start);
@@ -45,16 +50,16 @@ export function createBionicNode(
         return;
       }
 
-      const wordSpan = document.createElement("div");
+      const wordSpan = document.createElement(BIONIC_TAG_NAME);
       wordSpan.classList.add(BIONIC_IGNORED_CLASS);
 
-      const strong = document.createElement("div");
+      const strong = document.createElement(BIONIC_TAG_NAME);
       strong.classList.add(BIONIC_CLASS);
       strong.textContent = word.slice(0, boldLength);
       wordSpan.append(strong);
 
       if (boldLength < word.length) {
-        const remaining = document.createElement("div");
+        const remaining = document.createElement(BIONIC_TAG_NAME);
         remaining.classList.add(BIONIC_IGNORED_CLASS);
         remaining.textContent = word.slice(boldLength);
         wordSpan.append(remaining);
