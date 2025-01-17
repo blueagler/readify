@@ -24,11 +24,11 @@ export class DOMProcessor {
   private isProcessing = false;
   private mutationObserver!: MutationObserver;
   private observedElements = new WeakSet<Element>();
+  private parentTypeCheckCache = new WeakMap<Element, Map<string, boolean>>();
   private processedElements = new WeakSet<Element>();
   private processingSet = new WeakSet<Element>();
   private taskBuffer: Element[] = [];
   private taskQueue: (() => void)[] = [];
-  private parentTypeCheckCache = new WeakMap<Element, Map<string, boolean>>();
   constructor(config?: Partial<CustomizedConfig>) {
     this.$config.BIONIC.boldFactor =
       config?.boldFactor || this.$config.BIONIC.boldFactor;
@@ -43,6 +43,105 @@ export class DOMProcessor {
       this.$config.BIONIC.syllableExceptions.set(key, value),
     );
     this.setupObservers();
+  }
+  private checkElementTypes(
+    element: Element,
+    types: ElementCheckType[],
+  ): boolean {
+    if (!(element instanceof HTMLElement)) return false;
+    if (types.includes(ElementCheckType.Editable) && element.isContentEditable)
+      return true;
+
+    const config = types.reduce(
+      (acc, type) => {
+        return {
+          ATTRIBUTE_VALUES: acc.ATTRIBUTE_VALUES?.concat(
+            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].ATTRIBUTE_VALUES ||
+              [],
+          ),
+          ATTRIBUTES: acc.ATTRIBUTES?.concat(
+            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].ATTRIBUTES || [],
+          ),
+          CLASS_NAMES: acc.CLASS_NAMES?.concat(
+            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].CLASS_NAMES || [],
+          ),
+          CLOSEST: acc.CLOSEST?.concat(
+            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].CLOSEST || [],
+          ),
+          ROLES: acc.ROLES?.concat(
+            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].ROLES || [],
+          ),
+          STYLES: acc.STYLES?.concat(
+            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].STYLES || [],
+          ),
+          TAGS: acc.TAGS?.concat(
+            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].TAGS || [],
+          ),
+        };
+      },
+      {
+        ATTRIBUTE_VALUES: [],
+        ATTRIBUTES: [],
+        CLASS_NAMES: [],
+        CLOSEST: [],
+        ROLES: [],
+        STYLES: [],
+        TAGS: [],
+      } as ProcessorConfig["DOM_SELECTORS"]["ELEMENT_CHECKS"][ElementCheckType],
+    );
+
+    if (
+      config.TAGS?.includes(element.tagName) ||
+      config.ATTRIBUTES?.some((attr) => element.hasAttribute(attr)) ||
+      config.ATTRIBUTE_VALUES?.some(
+        ([attr, value]) => element.getAttribute(attr) === value,
+      ) ||
+      config.CLASS_NAMES?.some(
+        (className) =>
+          typeof element.className === "string" &&
+          element.className.includes(className),
+      ) ||
+      config.STYLES?.some(
+        ([prop, value]) =>
+          window.getComputedStyle(element)[prop as any] === value,
+      ) ||
+      (config.ROLES &&
+        element.hasAttribute("role") &&
+        config.ROLES.includes(
+          element.getAttribute("role")?.toLowerCase() || "",
+        )) ||
+      config.CLOSEST?.some((selector) => element.closest(selector) !== null)
+    ) {
+      return true;
+    }
+
+    let parent = element.parentElement;
+    while (parent) {
+      const cacheKey = types.join(",");
+
+      let parentCache = this.parentTypeCheckCache.get(parent);
+      if (parentCache) {
+        const cachedResult = parentCache.get(cacheKey);
+        if (cachedResult !== undefined) {
+          return cachedResult;
+        }
+      } else {
+        parentCache = new Map();
+        this.parentTypeCheckCache.set(parent, parentCache);
+      }
+
+      const result = this.checkElementTypes(parent, types);
+
+      parentCache.set(cacheKey, result);
+
+      if (result) {
+        return true;
+      }
+
+      parent = parent.parentElement;
+    }
+
+    return false;
   }
   private cleanupRemovedElement(root: Element): void {
     this.observedElements.delete(root);
@@ -129,105 +228,6 @@ export class DOMProcessor {
       [[], []],
     );
   }
-  private checkElementTypes(
-    element: Element,
-    types: ElementCheckType[],
-  ): boolean {
-    if (!(element instanceof HTMLElement)) return false;
-    if (types.includes(ElementCheckType.Editable) && element.isContentEditable)
-      return true;
-
-    const config = types.reduce(
-      (acc, type) => {
-        return {
-          TAGS: acc.TAGS?.concat(
-            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].TAGS || [],
-          ),
-          ATTRIBUTES: acc.ATTRIBUTES?.concat(
-            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].ATTRIBUTES || [],
-          ),
-          ATTRIBUTE_VALUES: acc.ATTRIBUTE_VALUES?.concat(
-            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].ATTRIBUTE_VALUES ||
-              [],
-          ),
-          CLASS_NAMES: acc.CLASS_NAMES?.concat(
-            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].CLASS_NAMES || [],
-          ),
-          STYLES: acc.STYLES?.concat(
-            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].STYLES || [],
-          ),
-          ROLES: acc.ROLES?.concat(
-            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].ROLES || [],
-          ),
-          CLOSEST: acc.CLOSEST?.concat(
-            this.$config.DOM_SELECTORS.ELEMENT_CHECKS[type].CLOSEST || [],
-          ),
-        };
-      },
-      {
-        TAGS: [],
-        ATTRIBUTES: [],
-        ATTRIBUTE_VALUES: [],
-        CLASS_NAMES: [],
-        STYLES: [],
-        ROLES: [],
-        CLOSEST: [],
-      } as ProcessorConfig["DOM_SELECTORS"]["ELEMENT_CHECKS"][ElementCheckType],
-    );
-
-    if (
-      config.TAGS?.includes(element.tagName) ||
-      config.ATTRIBUTES?.some((attr) => element.hasAttribute(attr)) ||
-      config.ATTRIBUTE_VALUES?.some(
-        ([attr, value]) => element.getAttribute(attr) === value,
-      ) ||
-      config.CLASS_NAMES?.some(
-        (className) =>
-          typeof element.className === "string" &&
-          element.className.includes(className),
-      ) ||
-      config.STYLES?.some(
-        ([prop, value]) =>
-          window.getComputedStyle(element)[prop as any] === value,
-      ) ||
-      (config.ROLES &&
-        element.hasAttribute("role") &&
-        config.ROLES.includes(
-          element.getAttribute("role")?.toLowerCase() || "",
-        )) ||
-      config.CLOSEST?.some((selector) => element.closest(selector) !== null)
-    ) {
-      return true;
-    }
-
-    let parent = element.parentElement;
-    while (parent) {
-      const cacheKey = types.join(",");
-
-      let parentCache = this.parentTypeCheckCache.get(parent);
-      if (parentCache) {
-        const cachedResult = parentCache.get(cacheKey);
-        if (cachedResult !== undefined) {
-          return cachedResult;
-        }
-      } else {
-        parentCache = new Map();
-        this.parentTypeCheckCache.set(parent, parentCache);
-      }
-
-      const result = this.checkElementTypes(parent, types);
-
-      parentCache.set(cacheKey, result);
-
-      if (result) {
-        return true;
-      }
-
-      parent = parent.parentElement;
-    }
-
-    return false;
-  }
   private processNewContent(root: Element | ShadowRoot): void {
     if (
       !root ||
@@ -310,6 +310,7 @@ export class DOMProcessor {
         },
       );
 
+      // eslint-disable-next-line no-empty
       while (walker.nextNode()) {}
 
       if (elements.size > 0) {
@@ -402,7 +403,7 @@ export class DOMProcessor {
   private queueTask(task: () => void): void {
     this.taskQueue.push(task);
     if (!this.isProcessing) {
-      queueMicrotask(() => this.processQueue());
+      queueMicrotask(() => void this.processQueue());
     }
   }
   private scheduleVisualUpdate(elements: Element[]): void {
@@ -492,7 +493,7 @@ export class DOMProcessor {
         if (targetElement && !debounceSet.has(targetElement)) {
           debounceSet.add(targetElement);
           if (!this.isProcessed(targetElement)) {
-            this.queueTask(() => this.processNewContent(targetElement!));
+            this.queueTask(() => this.processNewContent(targetElement));
           }
         }
       });

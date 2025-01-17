@@ -1,4 +1,5 @@
 import type { CustomizedConfig } from "./types";
+
 import { DOMProcessor } from "./core/DOMProcessor";
 import { initReadifyStyles } from "./styles";
 import { patchDOMMethods, restoreDOMMethods } from "./utils/dom/safeDOM";
@@ -23,7 +24,7 @@ export class Readify {
   public static init(config?: Partial<CustomizedConfig>): Readify {
     const instance = Readify.getInstance(config);
     if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", instance.$start);
+      document.addEventListener("DOMContentLoaded", () => instance.$start());
     } else {
       instance.$start();
     }

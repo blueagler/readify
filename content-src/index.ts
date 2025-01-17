@@ -1,8 +1,8 @@
 import { Readify } from "./Readify";
 
-let instance: Readify | null = null;
+let instance: null | Readify = null;
 
-export const start = async () => {
+export const start = () => {
   instance = Readify.init({
     boldCommonWords: true,
     boldSingleSyllables: true,

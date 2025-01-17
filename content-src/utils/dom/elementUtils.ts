@@ -87,8 +87,8 @@ function getAvailableFontWeights(element: Element): number[] {
 
 export interface CalculateWeightResult {
   boldWeight: number;
-  normalWeight: number;
   isVariable: boolean;
+  normalWeight: number;
 }
 
 export function calculateWeight(element: Element): CalculateWeightResult {
@@ -123,7 +123,7 @@ export function calculateWeight(element: Element): CalculateWeightResult {
 
   return {
     boldWeight,
-    normalWeight,
     isVariable,
+    normalWeight,
   };
 }

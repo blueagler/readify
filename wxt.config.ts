@@ -8,5 +8,5 @@ export default defineConfig({
     description:
       "Readify works by implementing a bionic reading mode on web text, making it more engaging and easier to understand.",
   },
-  modules: ["@wxt-dev/auto-icons"]
+  modules: ["@wxt-dev/auto-icons"],
 });

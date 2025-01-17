@@ -13,15 +13,15 @@ export const FV = "font-variation-settings";
 
 export function initReadifyStyles() {
   injectStyles({
-    [BIONIC_TAG_NAME]: {
-      display: "inline",
+    [`.${BIONIC_CLASS}`]: {
+      [FV]: `var(${BIONIC_BOLD_FONT_VARIATION})`,
+      [FW]: `var(${BIONIC_BOLD_FONT_WEIGHT})`,
     },
     [`.${BIONIC_IGNORED_CLASS}`]: {
       [FW]: `var(${BIONIC_FONT_WEIGHT})`,
     },
-    [`.${BIONIC_CLASS}`]: {
-      [FW]: `var(${BIONIC_BOLD_FONT_WEIGHT})`,
-      [FV]: `var(${BIONIC_BOLD_FONT_VARIATION})`,
+    [BIONIC_TAG_NAME]: {
+      display: "inline",
     },
   });
 }
@@ -34,7 +34,10 @@ interface StyleDefinition {
 
 function cssObjectToString(styles: Partial<CSSStyleDeclaration>): string {
   return Object.entries(styles)
-    .map(([key, value]) => `${key}: ${value};`)
+    .map(
+      ([key, value]) =>
+        `${key}: ${typeof value === "object" ? JSON.stringify(value) : String(value)};`,
+    )
     .join(" ");
 }
 

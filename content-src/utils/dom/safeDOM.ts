@@ -1,5 +1,8 @@
+// eslint-disable-next-line @typescript-eslint/unbound-method
 const originalRemoveChild = Node.prototype.removeChild;
+// eslint-disable-next-line @typescript-eslint/unbound-method
 const originalReplaceChild = Node.prototype.replaceChild;
+// eslint-disable-next-line @typescript-eslint/unbound-method
 const originalInsertBefore = Node.prototype.insertBefore;
 
 const modifiedNodes = new WeakSet<Node>();

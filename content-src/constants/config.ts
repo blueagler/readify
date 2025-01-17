@@ -469,6 +469,7 @@ const DOM_SELECTORS = {
       TAGS: ["CANVAS", "OBJECT", "EMBED"],
     },
     [ElementCheckType.Ignored]: {
+      CLASS_NAMES: ["button", "icon", "logo", "badge", "avatar", "spinner"],
       TAGS: [
         "SCRIPT",
         "STYLE",
@@ -527,7 +528,6 @@ const DOM_SELECTORS = {
         "ROUTER-VIEW",
         "ROUTER-LINK",
       ],
-      CLASS_NAMES: ["button", "icon", "logo", "badge", "avatar", "spinner"],
     },
   },
 } as const;
