@@ -7,13 +7,13 @@
     "@types/chrome": "0.0.287",
     "@types/node": "22.10.1",
     "@wxt-dev/auto-icons": "^1.0.2",
-    "eslint": "^9.16.0",
-    "eslint-plugin-perfectionist": "^4.1.2",
-    "gcc-ts-bundler": "0.1.2",
+    "eslint": "^9.18.0",
+    "eslint-plugin-perfectionist": "^4.6.0",
+    "gcc-ts-bundler": "0.1.5",
     "prettier": "3.4.1",
     "typescript": "5.8.0-dev.20241202",
-    "typescript-eslint": "8.17.1-alpha.0",
-    "wxt": "^0.19.17"
+    "typescript-eslint": "8.20.1-alpha.0",
+    "wxt": "^0.19.24"
   },
   "publishConfig": {
     "access": "public",
@@ -22,7 +22,7 @@
   "scripts": {
     "dev": "./scripts/dev.sh",
     "build": "./scripts/build.sh",
-    "build-content": "bun run ./scripts/build-content.ts",
+    "build-content": "bun --bun ./scripts/build-content.ts",
     "postinstall": "wxt prepare && chmod +x ./scripts/dev.sh && chmod +x ./scripts/build.sh",
     "lint": "bun --bun prettier . --write && bun --bun eslint . --fix"
   },

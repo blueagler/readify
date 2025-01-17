@@ -1,43 +1,32 @@
-// @ts-check
-
+//@ts-check
 import perfectionist from "eslint-plugin-perfectionist";
-import { config as _config, configs } from "typescript-eslint";
+import tseslint from "typescript-eslint";
+import eslint from "@eslint/js";
 
-export default _config(
-  ...configs.recommended.map((config) => ({
-    ...config,
-    files: ["**/*.ts"],
-  })),
+export default tseslint.config(
+  eslint.configs.recommended,
+  tseslint.configs.recommendedTypeChecked,
   {
-    files: ["**/*.ts"],
+    files: ["content-src/**/*.ts"],
     languageOptions: {
       parserOptions: {
         project: true,
-        tsconfigRootDir: __dirname,
+        tsconfigRootDir: import.meta.dirname,
+        projectService: true,
       },
     },
-  },
-  {
-    rules: {
-      "no-console": "off",
-    },
-  },
-  {
-    rules: {
-      "@typescript-eslint/no-dynamic-delete": "off",
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-for-in-array": "off",
-      "@typescript-eslint/no-unsafe-assignment": "off",
-      "@typescript-eslint/no-unsafe-member-access": "off",
-      "@typescript-eslint/no-unused-expressions": "off",
-      "@typescript-eslint/no-unused-vars": "off",
-    },
-  },
-  {
     plugins: {
       perfectionist,
     },
     rules: {
+      "no-console": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-for-in-array": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-dynamic-delete": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-non-null-assertion": "off",
       "perfectionist/sort-array-includes": [
         "error",
         {
@@ -92,13 +81,12 @@ export default _config(
             "unknown",
           ],
           internalPattern: [
-            "@/components/**",
-            "@/media/**",
-            "@/loaders/**",
-            "@/sections/**",
-            "@/utils/**",
+            "^@/components",
+            "^@/media",
+            "^@/loaders",
+            "^@/sections",
+            "^@/utils",
           ],
-          newlinesBetween: "always",
           order: "asc",
           type: "natural",
         },
@@ -149,10 +137,6 @@ export default _config(
       "perfectionist/sort-objects": [
         "error",
         {
-          customGroups: {
-            id: ["id", "name"],
-          },
-          groups: ["id", "unknown"],
           order: "asc",
           type: "alphabetical",
         },

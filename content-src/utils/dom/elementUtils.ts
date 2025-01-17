@@ -1,4 +1,5 @@
 import { PROCESSOR_CONFIG, screenHeight } from "../../constants/config";
+import { FV, FW } from "../../styles";
 import { ElementPosition } from "../../types";
 
 export function isElementVisible(element: Element): boolean {
@@ -92,16 +93,17 @@ export interface CalculateWeightResult {
 
 export function calculateWeight(element: Element): CalculateWeightResult {
   const elementStyle = window.getComputedStyle(element);
-  const fontVariationSettings = elementStyle.getPropertyValue(
-    "font-variation-settings",
-  );
+  const fontVariationSettings = elementStyle.getPropertyValue(FV);
   const isVariable = fontVariationSettings.includes("wght");
 
   const originalWeight =
     (isVariable
       ? parseInt(fontVariationSettings.split(" ")[1], 10)
-      : parseInt(elementStyle.fontWeight, 10)) ||
-    parseInt(window.getComputedStyle(document.body).fontWeight, 10) ||
+      : parseInt(elementStyle.getPropertyPriority(FW), 10)) ||
+    parseInt(
+      window.getComputedStyle(document.body).getPropertyPriority(FW),
+      10,
+    ) ||
     400;
 
   const availableWeights = isVariable ? [] : getAvailableFontWeights(element);

@@ -8,6 +8,8 @@ export const BIONIC_IGNORED_CLASS = generateName("__");
 export const BIONIC_FONT_WEIGHT = generateName("--");
 export const BIONIC_BOLD_FONT_WEIGHT = generateName("---");
 export const BIONIC_BOLD_FONT_VARIATION = generateName("---");
+export const FW = "font-weight";
+export const FV = "font-variation-settings";
 
 export function initReadifyStyles() {
   injectStyles({
@@ -15,25 +17,24 @@ export function initReadifyStyles() {
       display: "inline",
     },
     [`.${BIONIC_IGNORED_CLASS}`]: {
-      fontWeight: `var(${BIONIC_FONT_WEIGHT})`,
+      [FW]: `var(${BIONIC_FONT_WEIGHT})`,
     },
     [`.${BIONIC_CLASS}`]: {
-      fontWeight: `var(${BIONIC_BOLD_FONT_WEIGHT})`,
-      fontVariationSettings: `var(${BIONIC_BOLD_FONT_VARIATION})`,
+      [FW]: `var(${BIONIC_BOLD_FONT_WEIGHT})`,
+      [FV]: `var(${BIONIC_BOLD_FONT_VARIATION})`,
     },
   });
 }
 
 interface StyleDefinition {
-  [key: string]: Partial<CSSStyleDeclaration>;
+  [key: string]: {
+    [key: string]: string;
+  };
 }
 
 function cssObjectToString(styles: Partial<CSSStyleDeclaration>): string {
   return Object.entries(styles)
-    .map(([key, value]) => {
-      const cssKey = key.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`);
-      return `${cssKey}: ${value};`;
-    })
+    .map(([key, value]) => `${key}: ${value};`)
     .join(" ");
 }
 
