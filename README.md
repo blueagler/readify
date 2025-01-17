@@ -14,6 +14,9 @@
 - Performance optimized with progressive loading
 - Configurable settings for bold intensity and word processing
 
+⚠️ **Important Alert**
+> You should disable Readify when editing content or encountering any errors, as it defaults to converting all English words on all pages!
+
 ## Showcase
 
 <div style="display: flex; gap: 10px; justify-content: space-between;">
