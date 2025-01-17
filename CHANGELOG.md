@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.0.5] -2025-01-16
+
+### Performance Improvements
+
 ## [0.0.2] - 2024-01-07
 
 ### First Public Release 🎉
